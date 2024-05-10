@@ -34,7 +34,7 @@ class Deck:
         DB.disconnect()
         
         for i in query_result:
-            result.append(Deck(i[0], User.filter(username=i[1], first=True), i[2], i[3]))
+            result.append(Deck(i[0], User.change_into(username=i[1]), i[2], i[3]))
         
         if first == True:
             return result[0]
@@ -66,10 +66,11 @@ class Deck:
 
     def update(self, deck_id=None, owner_id=None):
         if owner_id is None or (deck_id is None and self.deck_id is None):
-            return
+            return self
         
         DB.connect()
-        query = f"""UPDATE `deck` SET {"`owner_id` = '" + owner_id + "'" if owner_id is not None else ""} {" , " if owner_id is not None else ""} {"`updated_at` = '" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "'"} WHERE `deck_id` = {str(deck_id) if deck_id is not None else self.deck_id}"""
+        query = f"""UPDATE `deck` SET `owner_id` = '{owner_id}', `updated_at` = '{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}' WHERE `deck_id` = {str(deck_id) if deck_id is not None else str(self.deck_id)}"""
+        print(query)
         query_result = DB.execute_query(query)
         DB.disconnect()
         
@@ -78,11 +79,12 @@ class Deck:
         
         return self.change_into(deck_id=deck_id if deck_id is not None else self.deck_id)
 
-    def delete(self, deck_id):
-        DB.connect()
-        query = f"DELETE FROM `deck` WHERE `deck_id` = '{str(deck_id)}'"
-        query_result = DB.execute_query(query)
-        DB.disconnect() 
+    def delete(self, deck_id=None):
+        if deck_id is not None or self.deck_id is not None:
+            DB.connect()
+            query = f"DELETE FROM `deck` WHERE `deck_id` = {str(deck_id) if deck_id is not None else str(self.deck_id)}"
+            query_result = DB.execute_query(query)
+            DB.disconnect() 
 
         return None
     
