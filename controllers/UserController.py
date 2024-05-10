@@ -13,20 +13,15 @@ class UserController(User):
     def filter(self, username=None, created_at=None, first=False):
         return super().filter(username, created_at, first)
         
+    def change_into(self, username):
+        return super().change_into(username)
+        
     def create(self, username, password):
-        if super().create(username, password) == True:
-            return super().filter(username=username, first=True)
-        return None
+        return super().create(username, password)
     
     def update(self, password, username=None):
-        if super().update(password, username) == True:
-            return  super().filter(username=username, first=True)
-        return None
+        return super().update(password, username)
     
     def delete(self, username=None):
-        super().delete(username)
-        return None
-    
-
-a =User()
-print(a.create("admin","1"))
+        return super().delete(username)
+        

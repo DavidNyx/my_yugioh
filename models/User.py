@@ -36,7 +36,7 @@ class User:
         
         result = []
         DB.connect()
-        query = f"""SELECT * FROM `user` WHERE {'`username` = "' + username + '"' if username is not None else ''} {' AND ' if username is not None and created_at is not None else ''} {'`created_at` = "' + created_at + '"' if created_at is not None else ''} {' LIMIT 1' if first == True else ''}"""
+        query = f"""SELECT * FROM `user` WHERE {"`username` = '" + username + "'" if username is not None else ""} {" AND " if username is not None and created_at is not None else ""} {"`created_at` = '" + created_at + "'" if created_at is not None else ""} {" LIMIT 1" if first == True else ""}"""
         query_result = DB.execute_query(query)
         DB.disconnect()
         
@@ -46,15 +46,29 @@ class User:
         if first == True:
             return result[0]
         return result
+    
+    def change_into(self, username):
+        DB.connect()
+        query = f"SELECT * FROM `user` WHERE `username` = '{username}'"
+        query_result = DB.execute_query(query)
+        DB.disconnect()
+        
+        self.username = query_result[0][0]
+        self.password = query_result[0][1]
+        self.created_at = query_result[0][2]
+        
+        return self
 
     def create(self, username, password):
         DB.connect()
         query = f"INSERT INTO `user`(`username`, `password`) VALUES ('{username}','{self.hash_password(password).decode('utf-8')}')"
         query_result = DB.execute_query(query)
         DB.disconnect()
+        
         if query_result == False:
-            return False
-        return True
+            return None
+
+        return self.change_into(username)
         
                 
     def update(self, password, username=None):
@@ -63,9 +77,11 @@ class User:
             query = f"UPDATE `user` SET `password`= '{self.hash_password(password).decode('utf-8')}' WHERE `username` = '{username if username is not None else self.username}'"
             query_result = DB.execute_query(query)
             DB.disconnect()
+            
             if query_result == False:
-                return False
-            return True
+                return None
+            
+            return self.change_into(username=username if username is not None else self.username)
         
     def delete(self, username=None):
         if username is not None or self.username is not None:
@@ -73,4 +89,6 @@ class User:
             query = f"DELETE FROM `user` WHERE `username` = '{username if username is not None else self.username}'"
             query_result = DB.execute_query(query)
             DB.disconnect()
+            
+            return None
             

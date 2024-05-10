@@ -5,7 +5,7 @@ from models.User import User
 from models.Database import DB
 
 class Deck:
-    def __init__(self, deck_id:int, owner:User, created_at:datetime.datetime, updated_at:datetime.datetime):
+    def __init__(self, deck_id:int=None, owner:User=None, created_at:datetime.datetime=None, updated_at:datetime.datetime=None):
         self.deck_id = deck_id
         self.owner = owner
         self.created_at = created_at
@@ -39,27 +39,50 @@ class Deck:
         if first == True:
             return result[0]
         return result
+    
+    def change_into(self, deck_id):
+        DB.connect()
+        query = f"SELECT * FROM `deck` WHERE `deck_id` = '{deck_id}'"
+        query_result = DB.execute_query(query)
+        DB.disconnect()
+        
+        self.deck_id = query_result[0][0]
+        self.owner = User().change_into(query_result[0][1])
+        self.created_at = query_result[0][2]
+        self.updated_at = query_result[0][3]
+        
+        return self
 
     def create(self, owner_id):
         DB.connect()
         query = f"INSERT INTO `deck`(`owner_id`) VALUES ('{owner_id}')"
         query_result = DB.execute_query(query)
         DB.disconnect()
+        
         if query_result == False:
-            return False
-        return True
+            return None
+        
+        return self.change_into(deck_id=query_result)
 
-    def update(self, deck_id=None, owner_id=None, updated_at=None):
-        if (owner_id is None and updated_at is None) or (deck_id is None and self.deck_id is None):
+    def update(self, deck_id=None, owner_id=None):
+        if owner_id is None or (deck_id is None and self.deck_id is None):
             return
         
         DB.connect()
-        query = f"""UPDATE `deck` SET {'`owner_id` = "' + owner_id + '"' if owner_id is not None else ''} {' AND ' if owner_id is not None and updated_at is not None else ''} {'`updated_at` = "' + updated_at + '"' if updated_at is not None else ''} WHERE `deck_id` = '{deck_id}'"""
+        query = f"""UPDATE `deck` SET {"`owner_id` = '" + owner_id + "'" if owner_id is not None else ""} {" , " if owner_id is not None else ""} {"`updated_at` = '" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "'"} WHERE `deck_id` = {str(deck_id) if deck_id is not None else self.deck_id}"""
         query_result = DB.execute_query(query)
         DB.disconnect()
+        
+        if query_result == False:
+            return None
+        
+        return self.change_into(deck_id=deck_id if deck_id is not None else self.deck_id)
 
     def delete(self, deck_id):
         DB.connect()
-        query = f"DELETE FROM `deck` WHERE `deck_id` = '{deck_id}'"
+        query = f"DELETE FROM `deck` WHERE `deck_id` = '{str(deck_id)}'"
         query_result = DB.execute_query(query)
-        DB.disconnect()
+        DB.disconnect() 
+
+        return None
+    

@@ -27,7 +27,12 @@ class MySQLDatabase:
         try:
             cursor = self.connection.cursor()
             cursor.execute(query)
-            result = cursor.fetchall()
+            
+            if query.find('INSERT') != -1 and query.find('INSERT INTO `user`') == -1:
+                result = cursor.lastrowid
+            else:
+                result = cursor.fetchall()
+                
             cursor.close()
             self.connection.commit()
             return result
