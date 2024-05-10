@@ -1,6 +1,5 @@
 import sys
 sys.path.append('./')
-from models.Database import DB
 from models.Category import Category
 
 class CategoryController(Category):

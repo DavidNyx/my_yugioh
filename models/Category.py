@@ -1,6 +1,7 @@
 import sys
 sys.path.append('./')
 from models.Database import DB
+
 class Category:
     def __init__(self, category_id:int=None, category_name:str=None):
         self.category_id = category_id
