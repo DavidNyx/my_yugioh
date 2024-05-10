@@ -24,7 +24,7 @@ class Category:
         
         result = []
         DB.connect()
-        query = f"""SELECT * FROM `category` WHERE {"`category_id` = '" + category_id + "'" if category_id is not None else ""} {" AND " if username is not None and created_at is not None else ""} {"`created_at` = '" + created_at + "'" if created_at is not None else ""} {" LIMIT 1" if first == True else ""}"""
+        query = f"""SELECT * FROM `category` WHERE {"`category_id` = '" + category_id + "'" if category_id is not None else ""} {" AND " if category_id is not None and category_name is not None else ""} {"`category_name` = '" + category_name + "'" if category_name is not None else ""} {" LIMIT 1" if first == True else ""}"""
         query_result = DB.execute_query(query)
         DB.disconnect()
         
