@@ -29,7 +29,7 @@ class Deck:
         
         result = []
         DB.connect()
-        query = f"""SELECT * FROM `deck` WHERE {'`deck_id` = ' + str(deck_id) if deck_id is not None else ''} {' AND ' if deck_id is not None and owner_id is not None else ''} {'`owner_id` = "' + owner_id + '"' if owner_id is not None else ''} {' AND ' if (deck_id is not None or owner_id is not None) and created_at is not None else ''} {'`created_at` = "' + created_at + '"' if created_at is not None else ''} {' AND ' if (deck_id is not None or owner_id is not None or created_at is not None) and updated_at is not None else ''} {'`updated_at` = "' + updated_at + '"' if updated_at is not None else ''} {' ORDER BY `deck_id` ' + order_by} {' LIMIT 1' if first == True else ''}"""
+        query = f"""SELECT * FROM `deck` WHERE {"`deck_id` = " + str(deck_id) if deck_id is not None else ""} {" AND " if deck_id is not None and owner_id is not None else ""} {"`owner_id` = " + str(owner_id) if owner_id is not None else ""} {" AND " if (deck_id is not None or owner_id is not None) and created_at is not None else ""} {"`created_at` = '" + created_at + "'" if created_at is not None else ""} {" AND " if (deck_id is not None or owner_id is not None or created_at is not None) and updated_at is not None else ""} {"`updated_at` = '" + updated_at + "'" if updated_at is not None else ""} {" ORDER BY `deck_id` " + order_by} {" LIMIT 1" if first == True else ''}"""
         query_result = DB.execute_query(query)
         DB.disconnect()
         
@@ -42,7 +42,7 @@ class Deck:
     
     def change_into(self, deck_id):
         DB.connect()
-        query = f"SELECT * FROM `deck` WHERE `deck_id` = '{deck_id}'"
+        query = f"SELECT * FROM `deck` WHERE `deck_id` = {str(deck_id)}"
         query_result = DB.execute_query(query)
         DB.disconnect()
         
@@ -55,7 +55,7 @@ class Deck:
 
     def create(self, owner_id):
         DB.connect()
-        query = f"INSERT INTO `deck`(`owner_id`) VALUES ('{owner_id}')"
+        query = f"INSERT INTO `deck`(`owner_id`) VALUES ({str(owner_id)})"
         query_result = DB.execute_query(query)
         DB.disconnect()
         
@@ -69,7 +69,7 @@ class Deck:
             return self
         
         DB.connect()
-        query = f"""UPDATE `deck` SET `owner_id` = '{owner_id}', `updated_at` = '{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}' WHERE `deck_id` = {str(deck_id) if deck_id is not None else str(self.deck_id)}"""
+        query = f"""UPDATE `deck` SET `owner_id` = {str(owner_id)}, `updated_at` = '{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}' WHERE `deck_id` = {str(deck_id) if deck_id is not None else str(self.deck_id)}"""
         print(query)
         query_result = DB.execute_query(query)
         DB.disconnect()

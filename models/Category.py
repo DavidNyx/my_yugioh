@@ -25,7 +25,7 @@ class Category:
         
         result = []
         DB.connect()
-        query = f"""SELECT * FROM `category` WHERE {"`category_id` = '" + category_id + "'" if category_id is not None else ""} {" AND " if category_id is not None and category_name is not None else ""} {"`category_name` = '" + category_name + "'" if category_name is not None else ""} {" LIMIT 1" if first == True else ""}"""
+        query = f"""SELECT * FROM `category` WHERE {"`category_id` = " + str(category_id) if category_id is not None else ""} {" AND " if category_id is not None and category_name is not None else ""} {"`category_name` = '" + category_name + "'" if category_name is not None else ""} {" LIMIT 1" if first == True else ""}"""
         query_result = DB.execute_query(query)
         DB.disconnect()
         
@@ -38,7 +38,7 @@ class Category:
     
     def change_into(self, category_id):
         DB.connect()
-        query = f"SELECT * FROM `category` WHERE `category_id` = '{category_id}'"
+        query = f"SELECT * FROM `category` WHERE `category_id` = {str(category_id)}"
         query_result = DB.execute_query(query)
         DB.disconnect()
         
@@ -62,7 +62,7 @@ class Category:
     def update(self, category_name, category_id=None):
         if category_id is not None or self.category_id is not None:
             DB.connect()
-            query = f"UPDATE `category` SET `category_name`= '{category_name}' WHERE `category_id` = '{category_id if category_id is not None else self.category_id}'"
+            query = f"UPDATE `category` SET `category_name`= '{category_name}' WHERE `category_id` = {str(category_id) if category_id is not None else str(self.category_id)}"
             query_result = DB.execute_query(query)
             DB.disconnect()
             
@@ -74,7 +74,7 @@ class Category:
     def delete(self, category_id=None):
         if category_id is not None or self.category_id is not None:
             DB.connect()
-            query = f"DELETE FROM `category` WHERE `category_id` = '{category_id if category_id is not None else self.category_id}'"
+            query = f"DELETE FROM `category` WHERE `category_id` = {str(category_id) if category_id is not None else str(self.category_id)}"
             query_result = DB.execute_query(query)
             DB.disconnect()
             

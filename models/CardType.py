@@ -25,7 +25,7 @@ class CardType:
         
         result = []
         DB.connect()
-        query = f"""SELECT * FROM `card_type` WHERE {"`card_type_id` = '" + card_type_id + "'" if card_type_id is not None else ""} {" AND " if card_type_id is not None and card_type_name is not None else ""} {"`card_type_name` = '" + card_type_name + "'" if card_type_name is not None else ""} {" LIMIT 1" if first == True else ""}"""
+        query = f"""SELECT * FROM `card_type` WHERE {"`card_type_id` = " + str(card_type_id) if card_type_id is not None else ""} {" AND " if card_type_id is not None and card_type_name is not None else ""} {"`card_type_name` = '" + card_type_name + "'" if card_type_name is not None else ""} {" LIMIT 1" if first == True else ""}"""
         query_result = DB.execute_query(query)
         DB.disconnect()
         
@@ -38,7 +38,7 @@ class CardType:
     
     def change_into(self, card_type_id):
         DB.connect()
-        query = f"SELECT * FROM `card_type` WHERE `card_type_id` = '{card_type_id}'"
+        query = f"SELECT * FROM `card_type` WHERE `card_type_id` = {str(card_type_id)}"
         query_result = DB.execute_query(query)
         DB.disconnect()
         
@@ -62,7 +62,7 @@ class CardType:
     def update(self, card_type_name, card_type_id=None):
         if card_type_id is not None or self.card_type_id is not None:
             DB.connect()
-            query = f"UPDATE `card_type` SET `card_type_name`= '{card_type_name}' WHERE `card_type_id` = '{card_type_id if card_type_id is not None else self.card_type_id}'"
+            query = f"UPDATE `card_type` SET `card_type_name`= '{card_type_name}' WHERE `card_type_id` = {str(card_type_id) if card_type_id is not None else str(self.card_type_id)}"
             query_result = DB.execute_query(query)
             DB.disconnect()
             
@@ -74,7 +74,7 @@ class CardType:
     def delete(self, card_type_id=None):
         if card_type_id is not None or self.card_type_id is not None:
             DB.connect()
-            query = f"DELETE FROM `card_type` WHERE `card_type_id` = '{card_type_id if card_type_id is not None else self.card_type_id}'"
+            query = f"DELETE FROM `card_type` WHERE `card_type_id` = {str(card_type_id) if card_type_id is not None else str(self.card_type_id)}"
             query_result = DB.execute_query(query)
             DB.disconnect()
             
