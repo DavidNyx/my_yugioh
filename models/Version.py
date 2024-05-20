@@ -7,50 +7,60 @@ class Version:
         self.version_id = version_id
         self.version_name = version_name
         
-    def all(self):
-        result = []
+    def all(self, order='version_name', order_by='ASC', limit=0):
         DB.connect()
         query = "SELECT * FROM `version`"
-        query_result = DB.execute_query(query)
+        query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
 
-        for i in query_result:
-            result.append(Version(i[0], i[1]))
-        
-        return result
+        if limit == 0 or limit > 1:
+            result = []
+            for i in query_result:
+                result.append(Version(i[0], i[1]))
+            return result
+        elif limit == 1:
+            return Version(query_result[0], query_result[1])
+        else:
+            return None
 
-    def filter(self, version_id=None, version_name=None, first=False):
+    def filter(self, version_id=None, version_name=None, order='version_name', order_by='ASC', limit=0):
         if version_id is None and version_name is None:
             return all()
         
-        result = []
         DB.connect()
-        query = f"""SELECT * FROM `version` WHERE {"`version_id` = " + str(version_id) if version_id is not None else ""} {" AND " if version_id is not None and version_name is not None else ""} {"`version_name` = '" + version_name + "'" if version_name is not None else ""} {" LIMIT 1" if first == True else ""}"""
-        query_result = DB.execute_query(query)
+        query = f"""SELECT * FROM `version` WHERE {"`version_id` = " + str(version_id) if version_id is not None else ""}{" AND " if version_id is not None and version_name is not None else ""}{"`version_name` = '" + version_name + "'" if version_name is not None else ""}"""
+        query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
         
-        for i in query_result:
-            result.append(Version(i[0], i[1]))
-        
-        if first == True:
-            return result[0]
-        return result
+        if limit == 0 or limit > 1:
+            result = []
+            for i in query_result:
+                result.append(Version(i[0], i[1]))
+            return result
+        elif limit == 1:
+            return Version(query_result[0], query_result[1])
+        else:
+            return None
     
-    def change_into(self, version_id):
+    def change_into(self, version_id=None):
+        if version_id is None:
+            self.version_id = None
+            self.version_name = None
+            return self
         DB.connect()
         query = f"SELECT * FROM `version` WHERE `version_id` = {str(version_id)}"
-        query_result = DB.execute_query(query)
+        query_result = DB.execute_query(query, limit=1)
         DB.disconnect()
         
-        self.version_id = query_result[0][0]
-        self.version_name = query_result[0][1]
+        self.version_id = query_result[0]
+        self.version_name = query_result[1]
         
         return self
 
     def create(self, version_name):
         DB.connect()
         query = f"INSERT INTO `version`(`version_name`) VALUES ('{version_name}')"
-        query_result = DB.execute_query(query)
+        query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
         
         if query_result == False:
@@ -78,5 +88,5 @@ class Version:
             query_result = DB.execute_query(query)
             DB.disconnect()
             
-            return None
+            return self.change_into()
             

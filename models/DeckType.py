@@ -7,50 +7,61 @@ class DeckType:
         self.deck_type_id = deck_type_id
         self.deck_type_name = deck_type_name
         
-    def all(self):
-        result = []
+    def all(self, order='deck_type_name', order_by='ASC', limit=0):
         DB.connect()
         query = "SELECT * FROM `deck_type`"
-        query_result = DB.execute_query(query)
+        query_result = DB.execute_query(query, order=order, order_by=order_by,limit=limit)
         DB.disconnect()
 
-        for i in query_result:
-            result.append(DeckType(i[0], i[1]))
-        
-        return result
+        if limit == 0 or limit > 1:
+            result = []
+            for i in query_result:
+                result.append(DeckType(i[0], i[1]))
+            return result
+        elif limit == 1:
+            return DeckType(query_result[0], query_result[1])
+        else:
+            return None
 
-    def filter(self, deck_type_id=None, deck_type_name=None, first=False):
+    def filter(self, deck_type_id=None, deck_type_name=None, order='deck_type_name', order_by='ASC', limit=0):
         if deck_type_id is None and deck_type_name is None:
             return all()
         
-        result = []
         DB.connect()
-        query = f"""SELECT * FROM `deck_type` WHERE {"`deck_type_id` = " + str(deck_type_id) if deck_type_id is not None else ""} {" AND " if deck_type_id is not None and deck_type_name is not None else ""} {"`deck_type_name` = '" + deck_type_name + "'" if deck_type_name is not None else ""} {" LIMIT 1" if first == True else ""}"""
-        query_result = DB.execute_query(query)
+        query = f"""SELECT * FROM `deck_type` WHERE {"`deck_type_id` = " + str(deck_type_id) if deck_type_id is not None else ""}{" AND " if deck_type_id is not None and deck_type_name is not None else ""}{"`deck_type_name` = '" + deck_type_name + "'" if deck_type_name is not None else ""}"""
+        query_result = DB.execute_query(query, order=order, order_by=order_by,limit=limit)
         DB.disconnect()
         
-        for i in query_result:
-            result.append(DeckType(i[0], i[1]))
+        if limit == 0 or limit > 1:
+            result = []
+            for i in query_result:
+                result.append(DeckType(i[0], i[1]))
+            return result
+        elif limit == 1:
+            return DeckType(query_result[0], query_result[1])
+        else:
+            return None
         
-        if first == True:
-            return result[0]
-        return result
-    
-    def change_into(self, deck_type_id):
+    def change_into(self, deck_type_id=None):
+        if deck_type_id is None:
+            self.deck_type_id = None
+            self.deck_type_name = None
+            return self
+        
         DB.connect()
         query = f"SELECT * FROM `deck_type` WHERE `deck_type_id` = {str(deck_type_id)}"
-        query_result = DB.execute_query(query)
+        query_result = DB.execute_query(query, limit=1)
         DB.disconnect()
         
-        self.deck_type_id = query_result[0][0]
-        self.deck_type_name = query_result[0][1]
+        self.deck_type_id = query_result[0]
+        self.deck_type_name = query_result[1]
         
         return self
 
     def create(self, deck_type_name):
         DB.connect()
         query = f"INSERT INTO `deck_type`(`deck_type_name`) VALUES ('{deck_type_name}')"
-        query_result = DB.execute_query(query)
+        query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
         
         if query_result == False:
@@ -78,5 +89,5 @@ class DeckType:
             query_result = DB.execute_query(query)
             DB.disconnect()
             
-            return None
+            return self.change_into()
             

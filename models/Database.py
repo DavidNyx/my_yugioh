@@ -23,15 +23,24 @@ class MySQLDatabase:
         if self.connection is not None and self.connection.is_connected():
             self.connection.close()
 
-    def execute_query(self, query):
+    def execute_query(self, query, order=None, order_by=None, limit=0):
         try:
+            if order is not None and order_by is not None:
+                query = query + f' ORDER BY `{order}` {order_by}'
+            if limit > 1:
+                query = query + f' LIMIT {limit}'
+                
             cursor = self.connection.cursor()
             cursor.execute(query)
             
-            if query.find('INSERT') != -1:
+            if limit == -1:
                 result = cursor.lastrowid
-            else:
+            elif limit == 0 or limit > 1:
                 result = cursor.fetchall()
+            elif limit == 1:
+                result = cursor.fetchone()
+            else:
+                result = None
                 
             cursor.close()
             self.connection.commit()

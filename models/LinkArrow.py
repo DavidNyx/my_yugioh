@@ -7,50 +7,61 @@ class LinkArrow:
         self.link_arrow_id = link_arrow_id
         self.link_arrow_name = link_arrow_name
         
-    def all(self):
-        result = []
+    def all(self, order='link_arrow_name', order_by='ASC', limit=0):
         DB.connect()
         query = "SELECT * FROM `link_arrow`"
-        query_result = DB.execute_query(query)
+        query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
 
-        for i in query_result:
-            result.append(LinkArrow(i[0], i[1]))
-        
-        return result
+        if limit == 0 or limit > 1:
+            result = []
+            for i in query_result:
+                result.append(LinkArrow(i[0], i[1]))
+            return result
+        elif limit == 1:
+            return LinkArrow(query_result[0], query_result[1])
+        else:
+            return None
 
-    def filter(self, link_arrow_id=None, link_arrow_name=None, first=False):
+    def filter(self, link_arrow_id=None, link_arrow_name=None, order='link_arrow_name', order_by='ASC', limit=0):
         if link_arrow_id is None and link_arrow_name is None:
             return all()
         
-        result = []
         DB.connect()
-        query = f"""SELECT * FROM `link_arrow` WHERE {"`link_arrow_id` = " + str(link_arrow_id) if link_arrow_id is not None else ""} {" AND " if link_arrow_id is not None and link_arrow_name is not None else ""} {"`link_arrow_name` = '" + link_arrow_name + "'" if link_arrow_name is not None else ""} {" LIMIT 1" if first == True else ""}"""
-        query_result = DB.execute_query(query)
+        query = f"""SELECT * FROM `link_arrow` WHERE {"`link_arrow_id` = " + str(link_arrow_id) if link_arrow_id is not None else ""}{" AND " if link_arrow_id is not None and link_arrow_name is not None else ""}{"`link_arrow_name` = '" + link_arrow_name + "'" if link_arrow_name is not None else ""}"""
+        query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
         
-        for i in query_result:
-            result.append(LinkArrow(i[0], i[1]))
-        
-        if first == True:
-            return result[0]
-        return result
+        if limit == 0 or limit > 1:
+            result = []
+            for i in query_result:
+                result.append(LinkArrow(i[0], i[1]))
+            return result
+        elif limit == 1:
+            return LinkArrow(query_result[0], query_result[1])
+        else:
+            return None
     
-    def change_into(self, link_arrow_id):
+    def change_into(self, link_arrow_id=None):
+        if link_arrow_id is None:
+            self.link_arrow_id = None
+            self.link_arrow_name = None
+            return self
+        
         DB.connect()
         query = f"SELECT * FROM `link_arrow` WHERE `link_arrow_id` = {str(link_arrow_id)}"
-        query_result = DB.execute_query(query)
+        query_result = DB.execute_query(query, limit=1)
         DB.disconnect()
         
-        self.link_arrow_id = query_result[0][0]
-        self.link_arrow_name = query_result[0][1]
+        self.link_arrow_id = query_result[0]
+        self.link_arrow_name = query_result[1]
         
         return self
 
     def create(self, link_arrow_name):
         DB.connect()
         query = f"INSERT INTO `link_arrow`(`link_arrow_name`) VALUES ('{link_arrow_name}')"
-        query_result = DB.execute_query(query)
+        query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
         
         if query_result == False:
@@ -78,5 +89,5 @@ class LinkArrow:
             query_result = DB.execute_query(query)
             DB.disconnect()
             
-            return None
+            return self.change_into()
             
