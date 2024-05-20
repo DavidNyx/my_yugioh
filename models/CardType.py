@@ -50,7 +50,7 @@ class CardType:
     
         DB.connect()
         query = f"SELECT * FROM `card_type` WHERE `card_type_id` = {str(card_type_id)}"
-        query_result = DB.execute_query(query, limit=-1)
+        query_result = DB.execute_query(query, limit=1)
         DB.disconnect()
         
         self.card_type_id = query_result[0]

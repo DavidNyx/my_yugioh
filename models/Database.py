@@ -29,7 +29,7 @@ class MySQLDatabase:
                 query = query + f' ORDER BY `{order}` {order_by}'
             if limit > 1:
                 query = query + f' LIMIT {limit}'
-                
+            print('query: ', query)
             cursor = self.connection.cursor()
             cursor.execute(query)
             

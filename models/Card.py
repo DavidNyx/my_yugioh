@@ -25,7 +25,7 @@ class Card:
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
 
-        if limit == 0 and limit > 1:
+        if limit == 0 or limit > 1:
             result = []
             for i in query_result:
                 result.append(Card(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], Category().change_into(category_id=i[8]), CardType().change_into(card_type_id=i[9]), Attribute().change_into(attr_id=i[10])))
@@ -45,7 +45,7 @@ class Card:
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
         
-        if limit == 0 and limit > 1:
+        if limit == 0 or limit > 1:
             result = []
             for i in query_result:
                 result.append(Card(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], Category().change_into(category_id=i[8]), CardType().change_into(card_type_id=i[9]), Attribute().change_into(attr_id=i[10])))
