@@ -12,6 +12,9 @@ class SubCategory:
         query = "SELECT * FROM `subcategory`"
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
 
         if limit == 0 or limit > 1:
             result = []
@@ -31,6 +34,9 @@ class SubCategory:
         query = f"""SELECT * FROM `subcategory` WHERE {"`subcategory_id` = " + str(subcategory_id) if subcategory_id is not None else ""}{" AND " if subcategory_id is not None and subcategory_name is not None else ""}{"`subcategory_name` = '" + subcategory_name + "'" if subcategory_name is not None else ""}"""
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
         
         if limit == 0 or limit > 1:
             result = []
@@ -52,6 +58,9 @@ class SubCategory:
         query_result = DB.execute_query(query, limit=1)
         DB.disconnect()
         
+        if query_result is None:
+            return None
+        
         self.subcategory_id = query_result[0]
         self.subcategory_name = query_result[1]
         
@@ -63,7 +72,7 @@ class SubCategory:
         query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
         
-        if query_result == False:
+        if query_result is None:
             return None
 
         return self.change_into(query_result)
@@ -76,7 +85,7 @@ class SubCategory:
             query_result = DB.execute_query(query)
             DB.disconnect()
             
-            if query_result == False:
+            if query_result is None:
                 return None
             
             return self.change_into(subcategory_id=subcategory_id if subcategory_id is not None else self.subcategory_id)
@@ -87,6 +96,9 @@ class SubCategory:
             query = f"DELETE FROM `subcategory` WHERE `subcategory_id` = {str(subcategory_id) if subcategory_id is not None else str(self.subcategory_id)}"
             query_result = DB.execute_query(query)
             DB.disconnect()
+            
+            if query_result is None:
+                return None
             
             return self.change_into()
             

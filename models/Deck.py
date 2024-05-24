@@ -5,10 +5,10 @@ from models.User import User
 from models.Database import DB
 
 class Deck:
-    def __init__(self, deck_id:int=None, deck_name:str=None, owner:User=None, created_at:datetime.datetime=None, updated_at:datetime.datetime=None):
+    def __init__(self, deck_id:int=None, deck_name:str=None, owner_id:str=None, created_at:datetime.datetime=None, updated_at:datetime.datetime=None):
         self.deck_id = deck_id
         self.deck_name = deck_name
-        self.owner = owner
+        self.owner = User.change_into(user_id=owner_id)
         self.created_at = created_at
         self.updated_at = updated_at
         
@@ -17,14 +17,17 @@ class Deck:
         query = "SELECT * FROM `deck`"
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
 
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Deck(i[0], i[1], User().change_into(user_id=i[2]), i[3], i[4]))
+                result.append(Deck(i[0], i[1], i[2], i[3], i[4]))
             return result
         elif limit == 1:
-            return Deck(query_result[0], query_result[1], User().change_into(user_id=query_result[2]), query_result[3], query_result[4])
+            return Deck(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4])
         else:
             return None
 
@@ -37,13 +40,16 @@ class Deck:
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
         
+        if query_result is None:
+            return None
+        
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Deck(i[0], i[1], User().change_into(user_id=i[2]), i[3], i[4]))
+                result.append(Deck(i[0], i[1], i[2], i[3], i[4]))
             return result
         elif limit == 1:
-            return Deck(query_result[0], query_result[1], User().change_into(user_id=query_result[2]), query_result[3], query_result[4])
+            return Deck(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4])
         else:
             return None
     
@@ -61,6 +67,9 @@ class Deck:
         query_result = DB.execute_query(query, limit=1)
         DB.disconnect()
         
+        if query_result is None:
+            return None
+        
         self.deck_id = query_result[0]
         self.deck_name = query_result[1]
         self.owner = User().change_into(query_result[2])
@@ -75,7 +84,7 @@ class Deck:
         query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
         
-        if query_result == False:
+        if query_result is None:
             return None
         
         return self.change_into(query_result)
@@ -89,7 +98,7 @@ class Deck:
         query_result = DB.execute_query(query)
         DB.disconnect()
         
-        if query_result == False:
+        if query_result is None:
             return None
         
         return self.change_into(deck_id=deck_id if deck_id is not None else self.deck_id)
@@ -99,7 +108,10 @@ class Deck:
             DB.connect()
             query = f"DELETE FROM `deck` WHERE `deck_id` = {str(deck_id) if deck_id is not None else str(self.deck_id)}"
             query_result = DB.execute_query(query)
-            DB.disconnect() 
+            DB.disconnect()
+            
+            if query_result is None:
+                return None
 
         return self.change_into()
     

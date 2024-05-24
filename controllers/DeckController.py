@@ -1,13 +1,11 @@
 from datetime import datetime
 import sys
 sys.path.append('./')
-from models.Database import DB
 from models.Deck import Deck
-import UserController
 
 class DeckController(Deck):
-    def __init__(self, deck_id: int=None, owner: UserController.User=None, created_at: datetime=None, updated_at: datetime=None):
-        super().__init__(deck_id, owner, created_at, updated_at)
+    def __init__(self, deck_id: int = None, deck_name: str = None, owner_id: str = None, created_at: datetime = None, updated_at: datetime = None):
+        super().__init__(deck_id, deck_name, owner_id, created_at, updated_at)
         
     def all(self, order='deck_name', order_by='ASC', limit=0):
         return super().all(order, order_by, limit)

@@ -12,6 +12,9 @@ class DeckType:
         query = "SELECT * FROM `deck_type`"
         query_result = DB.execute_query(query, order=order, order_by=order_by,limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
 
         if limit == 0 or limit > 1:
             result = []
@@ -31,6 +34,9 @@ class DeckType:
         query = f"""SELECT * FROM `deck_type` WHERE {"`deck_type_id` = " + str(deck_type_id) if deck_type_id is not None else ""}{" AND " if deck_type_id is not None and deck_type_name is not None else ""}{"`deck_type_name` = '" + deck_type_name + "'" if deck_type_name is not None else ""}"""
         query_result = DB.execute_query(query, order=order, order_by=order_by,limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
         
         if limit == 0 or limit > 1:
             result = []
@@ -53,6 +59,9 @@ class DeckType:
         query_result = DB.execute_query(query, limit=1)
         DB.disconnect()
         
+        if query_result is None:
+            return None
+        
         self.deck_type_id = query_result[0]
         self.deck_type_name = query_result[1]
         
@@ -64,7 +73,7 @@ class DeckType:
         query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
         
-        if query_result == False:
+        if query_result is None:
             return None
 
         return self.change_into(query_result)
@@ -77,7 +86,7 @@ class DeckType:
             query_result = DB.execute_query(query)
             DB.disconnect()
             
-            if query_result == False:
+            if query_result is None:
                 return None
             
             return self.change_into(deck_type_id=deck_type_id if deck_type_id is not None else self.deck_type_id)
@@ -88,6 +97,9 @@ class DeckType:
             query = f"DELETE FROM `deck_type` WHERE `deck_type_id` = {str(deck_type_id) if deck_type_id is not None else str(self.deck_type_id)}"
             query_result = DB.execute_query(query)
             DB.disconnect()
+            
+            if query_result is None:
+                return None
             
             return self.change_into()
             

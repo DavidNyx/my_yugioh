@@ -1,12 +1,16 @@
 import sys
+import importlib
 sys.path.append('./')
 from models.Database import DB
 from models.Category import Category
 from models.CardType import CardType
 from models.Attribute import Attribute
-
+try:
+    Card_Version = importlib.import_module("Card_Version")
+except:
+    Card_Version = importlib.import_module("models.Card_Version")
 class Card:
-    def __init__(self, card_id:str=None, card_name:str=None, desc:str=None, pendulum_effect:str=None, level_rank:int=None, scale:int=None, attack:int=None, defense:int=None, category:Category=None, type:CardType=None, attr:Attribute=None):
+    def __init__(self, card_id:str=None, card_name:str=None, desc:str=None, pendulum_effect:str=None, level_rank:int=None, scale:int=None, attack:int=None, defense:int=None, category_id:int=None, card_type_id:int=None, attr_id:int=None, card_versions:list=[]):
         self.card_id = card_id
         self.card_name = card_name
         self.desc = desc
@@ -15,23 +19,26 @@ class Card:
         self.scale = scale
         self.attack = attack
         self.defense = defense
-        self.category = category
-        self.type = type
-        self.attr = attr
-        
+        self.category = Category().change_into(category_id=category_id)
+        self.type = CardType().change_into(card_type_id=card_type_id)
+        self.attr = Attribute().change_into(attr_id=attr_id)
+        self.card_versions = card_versions
     def all(self, order='card_name', order_by='ASC', limit=0):
         DB.connect()
         query = "SELECT * FROM `card`"
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
 
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Card(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], Category().change_into(category_id=i[8]), CardType().change_into(card_type_id=i[9]), Attribute().change_into(attr_id=i[10])))
+                result.append(Card(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], Card_Version.Card_Version().filter(card_id=i[0], empty='card')))
             return result
         elif limit == 1:
-            return Card(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4], query_result[5], query_result[6],query_result[7], Category().change_into(category_id=query_result[8]), CardType().change_into(card_type_id=query_result[9]), Attribute().change_into(attr_id=query_result[10]))
+            return Card(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4], query_result[5], query_result[6],query_result[7], query_result[8], query_result[9], query_result[10], Card_Version.Card_Version().filter(card_id=query_result[0], empty='card'))
         else:
             return None
         
@@ -41,17 +48,20 @@ class Card:
         
         
         DB.connect()
-        query = f"""SELECT * FROM `card` WHERE {"card_id = '" + card_id + "'" if card_id is not None else ""}{" AND " if card_id is not None and card_name is not None else ""}{"card_name LIKE '%" + card_name + "%'" if card_name is not None else ""}{" AND " if (card_id is not None or card_name is not None) and desc is not None else ""}{"desc LIKE '%" + desc + "%'" if desc is not None else ""}{"AND " if (card_id is not None or card_name is not None or desc is not None) and pendulum_effect is not None else ""}{"pendulum_effect LIKE '%" + pendulum_effect + "%'" if pendulum_effect is not None else ""}{" AND " if (card_id is not None or card_name is not None or desc is not None or pendulum_effect is not None) and level_rank is not None else ""}{"level_rank = " + str(level_rank) if level_rank is not None else ""}{"AND " if (card_id is not None or card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None) and scale is not None else ""}{"scale = " + str(scale) if scale is not None else ""}{" AND " if (card_id is not None or card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None) and attack is not None else ""}{"attack = " + str(attack) if attack is not None else ""}{" AND " if (card_id is not None or card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None or attack is not None) and defense is not None else ""}{"defense = " + str(defense) if defense is not None else ""}{" AND " if (card_id is not None or card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None or attack is not None or defense is not None) and category_id is not None else ""}{"category_id = " + str(category_id) if category_id is not None else ""}{" AND " if (card_id is not None or card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None or attack is not None or defense is not None or category_id is not None) and card_type_id is not None else ""}{"card_type_id = " + str(card_type_id) if card_type_id is not None else ""}{" AND " if (card_type_id is not None or card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None or attack is not None or defense is not None or category_id is not None or card_type_id is not None) and attr_id is not None else ""}{"attr_id = " + str(attr_id) if attr_id is not None else ""} ORDER BY `{order}` {order_by}"""
+        query = f"""SELECT * FROM `card` WHERE {"card_id = '" + card_id + "'" if card_id is not None else ""}{" AND " if card_id is not None and card_name is not None else ""}{"card_name LIKE '%" + card_name + "%'" if card_name is not None else ""}{" AND " if (card_id is not None or card_name is not None) and desc is not None else ""}{"desc LIKE '%" + desc + "%'" if desc is not None else ""}{"AND " if (card_id is not None or card_name is not None or desc is not None) and pendulum_effect is not None else ""}{"pendulum_effect LIKE '%" + pendulum_effect + "%'" if pendulum_effect is not None else ""}{" AND " if (card_id is not None or card_name is not None or desc is not None or pendulum_effect is not None) and level_rank is not None else ""}{"level_rank = " + str(level_rank) if level_rank is not None else ""}{"AND " if (card_id is not None or card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None) and scale is not None else ""}{"scale = " + str(scale) if scale is not None else ""}{" AND " if (card_id is not None or card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None) and attack is not None else ""}{"attack = " + str(attack) if attack is not None else ""}{" AND " if (card_id is not None or card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None or attack is not None) and defense is not None else ""}{"defense = " + str(defense) if defense is not None else ""}{" AND " if (card_id is not None or card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None or attack is not None or defense is not None) and category_id is not None else ""}{"category_id = " + str(category_id) if category_id is not None else ""}{" AND " if (card_id is not None or card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None or attack is not None or defense is not None or category_id is not None) and card_type_id is not None else ""}{"card_type_id = " + str(card_type_id) if card_type_id is not None else ""}{" AND " if (card_type_id is not None or card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None or attack is not None or defense is not None or category_id is not None or card_type_id is not None) and attr_id is not None else ""}{"attr_id = " + str(attr_id) if attr_id is not None else ""}"""
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
         
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Card(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], Category().change_into(category_id=i[8]), CardType().change_into(card_type_id=i[9]), Attribute().change_into(attr_id=i[10])))
+                result.append(Card(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], Card_Version.Card_Version().filter(card_id=i[0], empty='card')))
             return result
         elif limit == 1:
-            return Card(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4], query_result[5], query_result[6],query_result[7], Category().change_into(category_id=query_result[8]), CardType().change_into(card_type_id=query_result[9]), Attribute().change_into(attr_id=query_result[10]))
+            return Card(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4], query_result[5], query_result[6],query_result[7], query_result[8], query_result[9], query_result[10], Card_Version.Card_Version().filter(card_id=query_result[0], empty='card'))
         else:
             return None
         
@@ -68,12 +78,16 @@ class Card:
             self.category = None
             self.type = None
             self.attr = None
+            self.card_versions = []
             return self
         
         DB.connect()
         query = f"SELECT * FROM `card` WHERE `card_id` = '{card_id}'"
         query_result = DB.execute_query(query, limit=1)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
         
         self.card_id = query_result[0]
         self.card_name = query_result[1]
@@ -86,6 +100,7 @@ class Card:
         self.category = Category().change_into(category_id=query_result[8])
         self.type = CardType().change_into(card_type_id=query_result[9])
         self.attr = Attribute().change_into(attr_id=query_result[10])
+        self.card_versions = Card_Version.Card_Version().filter(card_id=query_result[0], empty='card')
         
         return self
             
@@ -95,7 +110,7 @@ class Card:
         query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
         
-        if query_result == False:
+        if query_result is None:
             return None
         
         return self.change_into(query_result)
@@ -109,18 +124,21 @@ class Card:
         query_result = DB.execute_query(query)
         DB.disconnect()
         
-        if query_result == False:
+        if query_result is None:
             return None
         
         return self.change_into(card_id =card_id if card_id is not None else self.card_id)
     
     def delete(self, card_id=None):
-        if card_id is None and self.card_id is None:
-            return None
-        
-        DB.connect()
-        query = f"DELETE FROM `card` WHERE `card_id` = {str(card_id) if card_id is not None else str(self.card_id)}"
-        query_result = DB.execute_query(query)
-        DB.disconnect()
+        if card_id is not None or self.card_id is not None: 
+            Card_Version.Card_Version().delete(card_id=card_id if card_id is not None else self.card_id)  
+            DB.connect()
+            query = f"DELETE FROM `card` WHERE `card_id` = {str(card_id) if card_id is not None else str(self.card_id)}"
+            query_result = DB.execute_query(query)
+            DB.disconnect()
+            
+            if query_result is None:
+                return None
         
         return self.change_into()
+    

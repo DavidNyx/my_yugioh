@@ -27,7 +27,7 @@ class MySQLDatabase:
         try:
             if order is not None and order_by is not None:
                 query = query + f' ORDER BY `{order}` {order_by}'
-            if limit > 1:
+            if limit > 0:
                 query = query + f' LIMIT {limit}'
             print('query: ', query)
             cursor = self.connection.cursor()
@@ -35,6 +35,7 @@ class MySQLDatabase:
             
             if limit == -1:
                 result = cursor.lastrowid
+                cursor.fetchall()
             elif limit == 0 or limit > 1:
                 result = cursor.fetchall()
             elif limit == 1:
@@ -47,7 +48,7 @@ class MySQLDatabase:
             return result
         except mysql.connector.Error as e:
             print("Error executing query:", e)
-            return False
+            return None
 
 load_dotenv()
 DB = MySQLDatabase(host=os.getenv("DB_HOST"), user=os.getenv("DB_USER"), database=os.getenv("DB_NAME"))

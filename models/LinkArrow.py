@@ -12,6 +12,9 @@ class LinkArrow:
         query = "SELECT * FROM `link_arrow`"
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
 
         if limit == 0 or limit > 1:
             result = []
@@ -31,6 +34,9 @@ class LinkArrow:
         query = f"""SELECT * FROM `link_arrow` WHERE {"`link_arrow_id` = " + str(link_arrow_id) if link_arrow_id is not None else ""}{" AND " if link_arrow_id is not None and link_arrow_name is not None else ""}{"`link_arrow_name` = '" + link_arrow_name + "'" if link_arrow_name is not None else ""}"""
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
         
         if limit == 0 or limit > 1:
             result = []
@@ -53,6 +59,9 @@ class LinkArrow:
         query_result = DB.execute_query(query, limit=1)
         DB.disconnect()
         
+        if query_result is None:
+            return None
+        
         self.link_arrow_id = query_result[0]
         self.link_arrow_name = query_result[1]
         
@@ -64,7 +73,7 @@ class LinkArrow:
         query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
         
-        if query_result == False:
+        if query_result is None:
             return None
 
         return self.change_into(query_result)
@@ -77,7 +86,7 @@ class LinkArrow:
             query_result = DB.execute_query(query)
             DB.disconnect()
             
-            if query_result == False:
+            if query_result is None:
                 return None
             
             return self.change_into(link_arrow_id=link_arrow_id if link_arrow_id is not None else self.link_arrow_id)
@@ -88,6 +97,9 @@ class LinkArrow:
             query = f"DELETE FROM `link_arrow` WHERE `link_arrow_id` = {str(link_arrow_id) if link_arrow_id is not None else str(self.link_arrow_id)}"
             query_result = DB.execute_query(query)
             DB.disconnect()
+            
+            if query_result is None:
+                return None
             
             return self.change_into()
             

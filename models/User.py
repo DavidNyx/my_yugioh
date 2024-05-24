@@ -24,6 +24,9 @@ class User:
         query = "SELECT * FROM `user`"
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
 
         if limit == 0 or limit > 1:
             result = []
@@ -44,6 +47,9 @@ class User:
         query = f"""SELECT * FROM `user` WHERE {"`user_id` = " + str(user_id) if user_id is not None else ""}{" AND " if user_id is not None and username is not None else ""}{"`username` LIKE '%" + username + "%'" if username is not None else ""}{" AND " if (user_id is not None or username is not None) and created_at is not None else ""}{"`created_at` = '" + created_at + "'" if created_at is not None else ""}"""
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
         
         if limit == 0 or limit > 1:
             result = []
@@ -69,6 +75,9 @@ class User:
         query_result = DB.execute_query(query, limit=1)
         DB.disconnect()
         
+        if query_result is None:
+            return None
+        
         self.user_id = query_result[0]
         self.username = query_result[1]
         self.password = query_result[2]
@@ -82,7 +91,7 @@ class User:
         query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
         
-        if query_result == False:
+        if query_result is None:
             return None
 
         return self.change_into(query_result)
@@ -98,7 +107,7 @@ class User:
         query_result = DB.execute_query(query)
         DB.disconnect()
         
-        if query_result == False:
+        if query_result is None:
             return None
         
         return self.change_into(user_id=user_id if user_id is not None else self.user_id)
@@ -109,6 +118,9 @@ class User:
             query = f"DELETE FROM `user` WHERE `user_id` = {str(user_id) if user_id is not None else str(self.user_id)}"
             query_result = DB.execute_query(query)
             DB.disconnect()
+        
+            if query_result is None:
+                return None
             
         return self.change_into()
     

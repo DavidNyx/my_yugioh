@@ -12,6 +12,9 @@ class Category:
         query = "SELECT * FROM `category`"
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
 
         if limit == 0 or limit > 1:
             result = []
@@ -31,6 +34,9 @@ class Category:
         query = f"""SELECT * FROM `category` WHERE {"`category_id` = " + str(category_id) if category_id is not None else ""}{" AND " if category_id is not None and category_name is not None else ""}{"`category_name` = '" + category_name + "'" if category_name is not None else ""}"""
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
         
         if limit == 0 or limit > 1:
             result = []
@@ -53,6 +59,9 @@ class Category:
         query_result = DB.execute_query(query, limit=1)
         DB.disconnect()
         
+        if query_result is None:
+            return None
+        
         self.category_id = query_result[0]
         self.category_name = query_result[1]
         
@@ -64,7 +73,7 @@ class Category:
         query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
         
-        if query_result == False:
+        if query_result is None:
             return None
 
         return self.change_into(query_result)
@@ -77,7 +86,7 @@ class Category:
             query_result = DB.execute_query(query)
             DB.disconnect()
             
-            if query_result == False:
+            if query_result is None:
                 return None
             
             return self.change_into(category_id=category_id if category_id is not None else self.category_id)
@@ -88,6 +97,9 @@ class Category:
             query = f"DELETE FROM `category` WHERE `category_id` = {str(category_id) if category_id is not None else str(self.category_id)}"
             query_result = DB.execute_query(query)
             DB.disconnect()
+            
+            if query_result is None:
+                return None
             
             return self.change_into()
             

@@ -12,6 +12,9 @@ class Attribute:
         query = "SELECT * FROM `attribute`"
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
 
         if limit == 0 or limit > 1:
             result = []
@@ -31,6 +34,9 @@ class Attribute:
         query = f"""SELECT * FROM `attribute` WHERE {"`attr_id` = " + str(attr_id) if attr_id is not None else ""}{" AND " if attr_id is not None and attr_name is not None else ""}{"`attr_name` = '" + attr_name + "'" if attr_name is not None else ""}"""
         query_result = DB.execute_query(query, order=order, order_by=order_by, limit=limit)
         DB.disconnect()
+        
+        if query_result is None:
+            return None
         
         if limit == 0 or limit > 1:
             result = []
@@ -53,6 +59,9 @@ class Attribute:
         query_result = DB.execute_query(query, limit=1)
         DB.disconnect()
         
+        if query_result is None:
+            return None
+        
         self.attr_id = query_result[0]
         self.attr_name = query_result[1]
         
@@ -64,7 +73,7 @@ class Attribute:
         query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
         
-        if query_result == False:
+        if query_result is None:
             return None
 
         return self.change_into(query_result)
@@ -77,7 +86,7 @@ class Attribute:
             query_result = DB.execute_query(query)
             DB.disconnect()
             
-            if query_result == False:
+            if query_result is None:
                 return None
             
             return self.change_into(attr_id=attr_id if attr_id is not None else self.attr_id)
@@ -88,6 +97,9 @@ class Attribute:
             query = f"DELETE FROM `attribute` WHERE `attr_id` = {str(attr_id) if attr_id is not None else str(self.attr_id)}"
             query_result = DB.execute_query(query)
             DB.disconnect()
+            
+            if query_result is None:
+                return None
             
             return self.change_into()
             

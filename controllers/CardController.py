@@ -1,14 +1,11 @@
-from datetime import datetime
 import sys
 sys.path.append('./')
-from models.Database import DB
 from models.Card import Card
-import CategoryController, CardTypeController, AttributeController
 
 class CardController(Card):
-    def __init__(self, card_id: str = None, card_name: str = None, desc: str = None, pendulum_effect: str = None, level_rank: int = None, scale: int = None, attack: int = None, defense: int = None, category: CategoryController.Category = None, type: CardTypeController.CardType = None, attr: AttributeController.Attribute = None):
-        super().__init__(card_id, card_name, desc, pendulum_effect, level_rank, scale, attack, defense, category, type, attr)
-    
+    def __init__(self, card_id: str = None, card_name: str = None, desc: str = None, pendulum_effect: str = None, level_rank: int = None, scale: int = None, attack: int = None, defense: int = None, category_id: int = None, card_type_id: int = None, attr_id: int = None):
+        super().__init__(card_id, card_name, desc, pendulum_effect, level_rank, scale, attack, defense, category_id, card_type_id, attr_id)
+        
     def all(self, order='card_name', order_by='ASC', limit=0):
         return super().all(order, order_by, limit)
     
