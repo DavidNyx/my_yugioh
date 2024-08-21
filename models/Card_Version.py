@@ -62,8 +62,8 @@ class Card_Version():
         
     def change_into(self, card_id=None, version_id=None):
         if card_id is None or version_id is None:
-            self.card_id = None
-            self.version_id = None
+            self.card = None
+            self.version = None
             self.card_limit = None
             return self
         
@@ -75,15 +75,15 @@ class Card_Version():
         if query_result is None:
             return None
         
-        self.card = Card.Card().change_into(card_id=card_id)
-        self.version = Version.Version().change_into(version_id=version_id)
+        self.card = Card.Card().change_into(card_id=query_result[0])
+        self.version = Version.Version().change_into(version_id=query_result[1])
         self.card_limit = query_result[2]
         
         return self
     
     def create(self, card_id, version_id, card_limit):
         DB.connect()
-        query = f"INSERT INTO `card_version`(`card_id`, `version_id`, `card_limit`) VALUES ({str(card_id)}, {str(version_id)}, {str(card_limit)})"
+        query = f"INSERT INTO `card_version`(`card_id`, `version_id`, `card_limit`) VALUES ({card_id}, {str(version_id)}, {str(card_limit)})"
         query_result = DB.execute_query(query)
         DB.disconnect()
         
@@ -93,16 +93,16 @@ class Card_Version():
         return self.change_into(card_id=card_id, version_id=version_id)
     
     def update(self, card_id=None, version_id=None, card_limit=None):
-        if (card_id is not None and version_id is not None) or (self.card_id is not None and self.version_id is not None):
+        if (card_id is not None and version_id is not None) or (self.card.card_id is not None and self.version.version_id is not None):
             DB.connect()
-            query = f"UPDATE `card_version` SET `card_limit`= {str(card_limit)} WHERE `card_id` = '{card_id if card_id is not None else self.card_id}' AND `version_id` = {str(version_id) if version_id is not None else str(self.version_id)}"
+            query = f"UPDATE `card_version` SET `card_limit`= {str(card_limit)} WHERE `card_id` = '{card_id if card_id is not None else self.card.card_id}' AND `version_id` = {str(version_id) if version_id is not None else str(self.version.version_id)}"
             query_result = DB.execute_query(query)
             DB.disconnect()
             
             if query_result is None:
                 return None
             
-            return self.change_into(card_id=card_id if card_id is not None else self.card_id, version_id=version_id if version_id is not None else self.version_id)
+            return self.change_into(card_id=card_id if card_id is not None else self.card.card_id, version_id=version_id if version_id is not None else self.version.version_id)
         
     def delete(self, card_id=None, version_id=None):
         if card_id is not None or version_id is not None:
@@ -110,9 +110,9 @@ class Card_Version():
             query = f"""DELETE FROM `card_version` WHERE {"`card_id` = '" + card_id + "'" if card_id is not None else ""}{" AND " if card_id is not None and version_id is not None else ""}{"`version_id` = " + str(version_id) if version_id is not None else ""}"""
             query_result = DB.execute_query(query)
             DB.disconnect()
-        elif self.card_id is not None and self.version_id is not None:
+        elif self.card.card_id is not None and self.version.version_id is not None:
             DB.connect()
-            query = f"DELETE FROM `card_version` WHERE `card_id` = '{self.card_id}' AND `version_id` = {str(self.version_id)}"
+            query = f"DELETE FROM `card_version` WHERE `card_id` = '{self.card.card_id}' AND `version_id` = {str(self.version.version_id)}"
             query_result = DB.execute_query(query)
             DB.disconnect()
         

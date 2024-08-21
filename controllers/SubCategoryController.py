@@ -3,8 +3,8 @@ sys.path.append('./')
 from models.SubCategory import SubCategory
 
 class SubCategoryController(SubCategory):
-    def __init__(self, subcategory_id: int = None, subcategory_name: str = None):
-        super().__init__(subcategory_id, subcategory_name)
+    def __init__(self, subcategory_id: int = None, subcategory_name: str = None, card_subcategories: list = []):
+        super().__init__(subcategory_id, subcategory_name, card_subcategories)
         
     def all(self, order='subcategory_name', order_by='ASC', limit=0):
         return super().all(order, order_by, limit)

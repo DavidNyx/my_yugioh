@@ -3,8 +3,8 @@ sys.path.append('./')
 from models.LinkArrow import LinkArrow
 
 class LinkArrowController(LinkArrow):
-    def __init__(self, link_arrow_id: int = None, link_arrow_name: str = None):
-        super().__init__(link_arrow_id, link_arrow_name)
+    def __init__(self, link_arrow_id: int = None, link_arrow_name: str = None, card_links: list = []):
+        super().__init__(link_arrow_id, link_arrow_name, card_links)
         
     def all(self, order='link_arrow_name', order_by='ASC', limit=0):
         return super().all(order, order_by, limit)

@@ -9,8 +9,21 @@ try:
     Card_Version = importlib.import_module("Card_Version")
 except:
     Card_Version = importlib.import_module("models.Card_Version")
+try:
+    Card_Link = importlib.import_module("Card_Link")
+except:
+    Card_Link = importlib.import_module("models.Card_Link")
+try:
+    Card_SubCategory = importlib.import_module("Card_SubCategory")
+except:
+    Card_SubCategory = importlib.import_module("models.Card_SubCategory")
+try:
+    Card_Deck = importlib.import_module("Card_Deck")
+except:
+    Card_Deck = importlib.import_module("models.Card_Deck")
+    
 class Card:
-    def __init__(self, card_id:str=None, card_name:str=None, desc:str=None, pendulum_effect:str=None, level_rank:int=None, scale:int=None, attack:int=None, defense:int=None, category_id:int=None, card_type_id:int=None, attr_id:int=None, card_versions:list=[]):
+    def __init__(self, card_id:str=None, card_name:str=None, desc:str=None, pendulum_effect:str=None, level_rank:int=None, scale:int=None, attack:int=None, defense:int=None, category_id:int=None, card_type_id:int=None, attr_id:int=None, card_versions:list=[], card_links:list=[], card_subcategories:list=[], card_decks:list=[]):
         self.card_id = card_id
         self.card_name = card_name
         self.desc = desc
@@ -23,6 +36,10 @@ class Card:
         self.type = CardType().change_into(card_type_id=card_type_id)
         self.attr = Attribute().change_into(attr_id=attr_id)
         self.card_versions = card_versions
+        self.card_links = card_links
+        self.card_subcategories = card_subcategories
+        self.card_decks = card_decks
+        
     def all(self, order='card_name', order_by='ASC', limit=0):
         DB.connect()
         query = "SELECT * FROM `card`"
@@ -35,10 +52,10 @@ class Card:
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Card(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], Card_Version.Card_Version().filter(card_id=i[0], empty='card')))
+                result.append(Card(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], Card_Version.Card_Version().filter(card_id=i[0], empty='card'), Card_Link.Card_Link().filter(card_id=i[0], empty='card'), Card_SubCategory.Card_SubCategory().filter(card_id=i[0], empty='card'), Card_Deck.Card_Deck().filter(card_id=i[0], empty='card')))
             return result
         elif limit == 1:
-            return Card(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4], query_result[5], query_result[6],query_result[7], query_result[8], query_result[9], query_result[10], Card_Version.Card_Version().filter(card_id=query_result[0], empty='card'))
+            return Card(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4], query_result[5], query_result[6],query_result[7], query_result[8], query_result[9], query_result[10], Card_Version.Card_Version().filter(card_id=query_result[0], empty='card'), Card_Link.Card_Link().filter(card_id=query_result[0]), Card_SubCategory.Card_SubCategory().filter(card_id=query_result[0]), Card_Deck.Card_Deck().filter(card_id=query_result[0], empty='card'))
         else:
             return None
         
@@ -58,10 +75,10 @@ class Card:
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Card(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], Card_Version.Card_Version().filter(card_id=i[0], empty='card')))
+                result.append(Card(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], Card_Version.Card_Version().filter(card_id=i[0], empty='card'), Card_Link.Card_Link().filter(card_id=i[0], empty='card'), Card_SubCategory.Card_SubCategory().filter(card_id=i[0], empty='card'), Card_Deck.Card_Deck().filter(card_id=i[0], empty='card')))
             return result
         elif limit == 1:
-            return Card(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4], query_result[5], query_result[6],query_result[7], query_result[8], query_result[9], query_result[10], Card_Version.Card_Version().filter(card_id=query_result[0], empty='card'))
+            return Card(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4], query_result[5], query_result[6],query_result[7], query_result[8], query_result[9], query_result[10], Card_Version.Card_Version().filter(card_id=query_result[0], empty='card'), Card_Link.Card_Link().filter(card_id=query_result[0], empty='card'), Card_SubCategory.Card_SubCategory().filter(card_id=query_result[0], empty='card'), Card_Deck.Card_Deck().filter(card_id=query_result[0], empty='card'))
         else:
             return None
         
@@ -79,6 +96,9 @@ class Card:
             self.type = None
             self.attr = None
             self.card_versions = []
+            self.card_links = []
+            self.card_subcategories = []
+            self.card_decks = []
             return self
         
         DB.connect()
@@ -101,6 +121,9 @@ class Card:
         self.type = CardType().change_into(card_type_id=query_result[9])
         self.attr = Attribute().change_into(attr_id=query_result[10])
         self.card_versions = Card_Version.Card_Version().filter(card_id=query_result[0], empty='card')
+        self.card_links = Card_Link.Card_Link().filter(card_id=query_result[0], empty='card')
+        self.card_subcategories = Card_SubCategory.Card_SubCategory().filter(card_id=query_result[0], empty='card')
+        self.card_decks = Card_Deck.Card_Deck().filter(card_id=query_result[0], empty='card')
         
         return self
             
@@ -131,7 +154,10 @@ class Card:
     
     def delete(self, card_id=None):
         if card_id is not None or self.card_id is not None: 
-            Card_Version.Card_Version().delete(card_id=card_id if card_id is not None else self.card_id)  
+            Card_Version.Card_Version().delete(card_id=card_id if card_id is not None else self.card_id)
+            Card_Link.Card_Link().delete(card_id=card_id if card_id is not None else self.card_id)
+            Card_SubCategory.Card_SubCategory().delete(card_id=card_id if card_id is not None else self.card_id)
+            Card_Deck.Card_Deck().delete(card_id=card_id if card_id is not None else self.card_id)
             DB.connect()
             query = f"DELETE FROM `card` WHERE `card_id` = {str(card_id) if card_id is not None else str(self.card_id)}"
             query_result = DB.execute_query(query)

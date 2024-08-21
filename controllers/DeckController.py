@@ -4,8 +4,8 @@ sys.path.append('./')
 from models.Deck import Deck
 
 class DeckController(Deck):
-    def __init__(self, deck_id: int = None, deck_name: str = None, owner_id: str = None, created_at: datetime = None, updated_at: datetime = None):
-        super().__init__(deck_id, deck_name, owner_id, created_at, updated_at)
+    def __init__(self, deck_id: int = None, deck_name: str = None, owner_id: str = None, created_at: datetime = None, updated_at: datetime = None, card_decks: list = []):
+        super().__init__(deck_id, deck_name, owner_id, created_at, updated_at, card_decks)
         
     def all(self, order='deck_name', order_by='ASC', limit=0):
         return super().all(order, order_by, limit)

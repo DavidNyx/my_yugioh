@@ -3,8 +3,8 @@ sys.path.append('./')
 from models.Version import Version
 
 class VersionController(Version):
-    def __init__(self, version_id: int = None, version_name: str = None):
-        super().__init__(version_id, version_name)
+    def __init__(self, version_id: int = None, version_name: str = None, card_versions:list = []):
+        super().__init__(version_id, version_name, card_versions)
         
     def all(self, order='version_name', order_by='ASC', limit=0):
         return super().all(order, order_by, limit)

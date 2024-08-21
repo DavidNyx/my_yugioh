@@ -1,16 +1,22 @@
 import datetime
 import sys
+import importlib
 sys.path.append('./')
 from models.User import User
 from models.Database import DB
+try:
+    Card_Deck = importlib.import_module("Card_Deck")
+except:
+    Card_Deck = importlib.import_module("models.Card_Deck")
 
 class Deck:
-    def __init__(self, deck_id:int=None, deck_name:str=None, owner_id:str=None, created_at:datetime.datetime=None, updated_at:datetime.datetime=None):
+    def __init__(self, deck_id:int=None, deck_name:str=None, owner_id:str=None, created_at:datetime.datetime=None, updated_at:datetime.datetime=None, card_decks:list=[]):
         self.deck_id = deck_id
         self.deck_name = deck_name
         self.owner = User.change_into(user_id=owner_id)
         self.created_at = created_at
         self.updated_at = updated_at
+        self.card_decks = card_decks
         
     def all(self, order='deck_name', order_by='ASC', limit=0):
         DB.connect()
@@ -24,10 +30,10 @@ class Deck:
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Deck(i[0], i[1], i[2], i[3], i[4]))
+                result.append(Deck(i[0], i[1], i[2], i[3], i[4], Card_Deck.Card_Deck().filter(deck_id=i[0], empty='deck')))
             return result
         elif limit == 1:
-            return Deck(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4])
+            return Deck(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4], Card_Deck.Card_Deck().filter(deck_id=query_result[0], empty='deck'))
         else:
             return None
 
@@ -46,10 +52,10 @@ class Deck:
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Deck(i[0], i[1], i[2], i[3], i[4]))
+                result.append(Deck(i[0], i[1], i[2], i[3], i[4], Card_Deck.Card_Deck().filter(deck_id=i[0], empty='deck')))
             return result
         elif limit == 1:
-            return Deck(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4])
+            return Deck(query_result[0], query_result[1], query_result[2], query_result[3], query_result[4], Card_Deck.Card_Deck().filter(deck_id=query_result[0], empty='deck'))
         else:
             return None
     
@@ -60,6 +66,7 @@ class Deck:
             self.owner = None
             self.created_at = None
             self.updated_at = None
+            self.card_decks = []
             return self
         
         DB.connect()
@@ -75,6 +82,7 @@ class Deck:
         self.owner = User().change_into(query_result[2])
         self.created_at = query_result[3]
         self.updated_at = query_result[4]
+        self.card_decks = Card_Deck.Card_Deck().filter(deck_id=query_result[0], empty='deck')
         
         return self
 
@@ -105,6 +113,7 @@ class Deck:
 
     def delete(self, deck_id=None):
         if deck_id is not None or self.deck_id is not None:
+            Card_Deck.Card_Deck().delete(deck_id=deck_id if deck_id is not None else self.deck_id)
             DB.connect()
             query = f"DELETE FROM `deck` WHERE `deck_id` = {str(deck_id) if deck_id is not None else str(self.deck_id)}"
             query_result = DB.execute_query(query)
