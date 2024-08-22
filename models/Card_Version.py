@@ -40,7 +40,7 @@ class Card_Version():
     
     def filter(self, card_id=None, version_id=None, card_limit=None, order='card_limit', order_by='ASC', limit=0, empty=None):
         if card_id is None and version_id is None and card_limit is None:
-            return all()
+            return Card_Version().all()
         
         DB.connect()
         query = f"""SELECT * FROM `card_version` WHERE {"`card_id` = '" + card_id + "'" if card_id is not None else ""}{" AND " if card_id is not None and version_id is not None else ""}{"`version_id` = " + str(version_id) if version_id is not None else ""}{" AND " if (card_id is not None or version_id is not None) and card_limit is not None else ""}{"`card_limit` = " + str(card_limit) if card_limit is not None else ""}"""

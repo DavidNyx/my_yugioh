@@ -28,7 +28,7 @@ class CardType:
 
     def filter(self, card_type_id=None, card_type_name=None, order='card_type_name', order_by='ASC', limit=0):
         if card_type_id is None and card_type_name is None:
-            return all()
+            return CardType().all()
         
         DB.connect()
         query = f"""SELECT * FROM `card_type` WHERE {"`card_type_id` = " + str(card_type_id) if card_type_id is not None else ""}{" AND " if card_type_id is not None and card_type_name is not None else ""}{"`card_type_name` = '" + card_type_name + "'" if card_type_name is not None else ""}"""

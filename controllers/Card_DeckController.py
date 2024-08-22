@@ -2,7 +2,7 @@ import sys
 sys.path.append('./')
 from models.Card_Deck import Card_Deck
 
-class Card_VesionController(Card_Deck):
+class Card_DeckController(Card_Deck):
     def __init__(self, card_id: str = None, deck_id: int = None, deck_type_id: int = None, number_of_copies: int = 0):
         super().__init__(card_id, deck_id, deck_type_id, number_of_copies)
     

@@ -2,7 +2,7 @@ import sys
 sys.path.append('./')
 from models.Card_Link import Card_Link
 
-class Card_VesionController(Card_Link):
+class Card_LinkController(Card_Link):
     def __init__(self, card_id: str = None, link_arrow_id: int = None):
         super().__init__(card_id, link_arrow_id)
     

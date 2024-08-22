@@ -33,7 +33,7 @@ class SubCategory:
 
     def filter(self, subcategory_id=None, subcategory_name=None, order='subcategory_name', order_by='ASC', limit=0):
         if subcategory_id is None and subcategory_name is None:
-            return all()
+            return SubCategory().all()
         
         DB.connect()
         query = f"""SELECT * FROM `subcategory` WHERE {"`subcategory_id` = " + str(subcategory_id) if subcategory_id is not None else ""}{" AND " if subcategory_id is not None and subcategory_name is not None else ""}{"`subcategory_name` = '" + subcategory_name + "'" if subcategory_name is not None else ""}"""

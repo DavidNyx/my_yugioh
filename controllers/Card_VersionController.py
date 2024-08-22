@@ -2,7 +2,7 @@ import sys
 sys.path.append('./')
 from models.Card_Version import Card_Version
 
-class Card_VesionController(Card_Version):
+class Card_VersionController(Card_Version):
     def __init__(self, card_id: str = None, version_id: int = None, card_limit: int = None):
         super().__init__(card_id, version_id, card_limit)
     

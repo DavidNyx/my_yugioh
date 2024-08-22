@@ -15,8 +15,8 @@ class CardController(Card):
     def change_into(self, card_id=None):
         return super().change_into(card_id)
     
-    def create(self, card_name, desc, category_id, card_type_id, pendulum_effect=None, level_rank=None, scale=None, attack=None, defense=None, attr_id=None):
-        return super().create(card_name, desc, category_id, card_type_id, pendulum_effect, level_rank, scale, attack, defense, attr_id)
+    def create(self, card_id, card_name, desc, category_id, card_type_id, pendulum_effect=None, level_rank=None, scale=None, attack=None, defense=None, attr_id=None):
+        return super().create(card_id, card_name, desc, category_id, card_type_id, pendulum_effect, level_rank, scale, attack, defense, attr_id)
     
     def update(self, card_id=None, card_name=None, desc=None, pendulum_effect=None, level_rank=None, scale=None, attack=None, defense=None, category_id=None, card_type_id=None, attr_id=None):
         return super().update(card_id, card_name, desc, pendulum_effect, level_rank, scale, attack, defense, category_id, card_type_id, attr_id)

@@ -40,7 +40,7 @@ class User:
 
     def filter(self, user_id=None, username=None, created_at=None, order='username', order_by='ASC', limit=0):
         if user_id is None and username is None and created_at is None:
-            return all()
+            return User().all()
         
         
         DB.connect()

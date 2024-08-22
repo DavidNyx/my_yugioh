@@ -11,7 +11,7 @@ try:
 except:
     LinkArrow = importlib.import_module("models.LinkArrow")
 
-class Card_Link():
+class Card_Link:
     def __init__(self, card_id:str=None, link_arrow_id:int=None):
         self.card = Card.Card().change_into(card_id=card_id)
         self.link_arrow = LinkArrow.LinkArrow().change_into(link_arrow_id=link_arrow_id)
@@ -37,7 +37,7 @@ class Card_Link():
     
     def filter(self, card_id=None, link_arrow_id=None, order='card_id', order_by='ASC', limit=0, empty=None):
         if card_id is None and link_arrow_id is None:
-            return all()
+            return Card_Link().all()
         
         DB.connect()
         query = f"""SELECT * FROM `card_link` WHERE {"`card_id` = '" + card_id + "'" if card_id is not None else ""}{" AND " if card_id is not None and link_arrow_id is not None else ""}{"`link_arrow_id` = " + str(link_arrow_id) if link_arrow_id is not None else ""}"""

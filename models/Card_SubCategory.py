@@ -11,7 +11,7 @@ try:
 except:
     SubCategory = importlib.import_module("models.SubCategory")
 
-class Card_SubCategory():
+class Card_SubCategory:
     def __init__(self, card_id:str=None, subcategory_id:int=None):
         self.card = Card.Card().change_into(card_id=card_id)
         self.subcategory = SubCategory.SubCategory().change_into(subcategory_id=subcategory_id)
@@ -37,7 +37,7 @@ class Card_SubCategory():
     
     def filter(self, card_id=None, subcategory_id=None, order='card_id', order_by='ASC', limit=0, empty=None):
         if card_id is None and subcategory_id is None:
-            return all()
+            return Card_SubCategory().all()
         
         DB.connect()
         query = f"""SELECT * FROM `card_subcategory` WHERE {"`card_id` = '" + card_id + "'" if card_id is not None else ""}{" AND " if card_id is not None and subcategory_id is not None else ""}{"`subcategory_id` = " + str(subcategory_id) if subcategory_id is not None else ""}"""

@@ -34,7 +34,7 @@ class LinkArrow:
 
     def filter(self, link_arrow_id=None, link_arrow_name=None, order='link_arrow_name', order_by='ASC', limit=0):
         if link_arrow_id is None and link_arrow_name is None:
-            return all()
+            return LinkArrow().all()
         
         DB.connect()
         query = f"""SELECT * FROM `link_arrow` WHERE {"`link_arrow_id` = " + str(link_arrow_id) if link_arrow_id is not None else ""}{" AND " if link_arrow_id is not None and link_arrow_name is not None else ""}{"`link_arrow_name` = '" + link_arrow_name + "'" if link_arrow_name is not None else ""}"""

@@ -13,7 +13,7 @@ class Deck:
     def __init__(self, deck_id:int=None, deck_name:str=None, owner_id:str=None, created_at:datetime.datetime=None, updated_at:datetime.datetime=None, card_decks:list=[]):
         self.deck_id = deck_id
         self.deck_name = deck_name
-        self.owner = User.change_into(user_id=owner_id)
+        self.owner = User().change_into(user_id=owner_id)
         self.created_at = created_at
         self.updated_at = updated_at
         self.card_decks = card_decks
@@ -39,7 +39,7 @@ class Deck:
 
     def filter(self, deck_id=None, deck_name=None, owner_id=None, created_at=None, updated_at=None, limit=0, order='deck_id', order_by='ASC'):
         if deck_id is None and deck_name and owner_id is None and created_at is None and updated_at is None:
-            return all()
+            return Deck().all()
         
         DB.connect()
         query = f"""SELECT * FROM `deck` WHERE {"`deck_id` = " + str(deck_id) if deck_id is not None else ""}{" AND " if deck_id is not None and deck_name is not None else ""}{"`deck_name` LIKE '%" + deck_name + "%'" if deck_name is not None else ""}{" AND " if (deck_id is not None or deck_name is not None) and owner_id is not None else ""}{"`owner_id` = " + str(owner_id) if owner_id is not None else ""}{" AND " if (deck_id is not None or deck_name is not None or owner_id is not None) and created_at is not None else ""}{"`created_at` = '" + created_at + "'" if created_at is not None else ""}{" AND " if (deck_id is not None or deck_name is not None or owner_id is not None or created_at is not None) and updated_at is not None else ""}{"updated_at = '" + updated_at + "'" if updated_at is not None else ""}"""

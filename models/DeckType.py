@@ -36,7 +36,7 @@ class DeckType:
 
     def filter(self, deck_type_id=None, deck_type_name=None, min_size=None, max_size=None, order='deck_type_name', order_by='ASC', limit=0):
         if deck_type_id is None and deck_type_name is None and min_size is None and max_size is None:
-            return all()
+            return DeckType().all()
         
         DB.connect()
         query = f"""SELECT * FROM `deck_type` WHERE {"`deck_type_id` = " + str(deck_type_id) if deck_type_id is not None else ""}{" AND " if deck_type_id is not None and deck_type_name is not None else ""}{"`deck_type_name` = '" + deck_type_name + "'" if deck_type_name is not None else ""}{" AND " if (deck_type_id is not None or deck_type_name is not None) and min_size is not None else ""}{"min_size = " + str(min_size) if min_size is not None else ""}{" AND " if (deck_type_id is not None or deck_type_name is not None or min_size is not None) and max_size is not None else ""}{"max_size = " + str(max_size) if max_size is not None else ""}"""

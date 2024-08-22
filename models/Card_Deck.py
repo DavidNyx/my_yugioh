@@ -15,7 +15,7 @@ try:
 except:
     DeckType = importlib.import_module("models.DeckType")
 
-class Card_Deck():
+class Card_Deck:
     def __init__(self, card_id:str=None, deck_id:int=None, deck_type_id:int=None, number_of_copies:int=0):
         self.card = Card.Card().change_into(card_id=card_id)
         self.deck = Deck.Deck().change_into(deck_id=deck_id)
@@ -43,7 +43,7 @@ class Card_Deck():
     
     def filter(self, card_id=None, deck_id=None, deck_type_id=None, order='card_id', order_by='ASC', limit=0, empty=None):
         if card_id is None and deck_id is None and deck_type_id is None:
-            return all()
+            return Card_Deck().all()
         
         DB.connect()
         query = f"""SELECT * FROM `card_deck` WHERE {"`card_id` = '" + card_id + "'" if card_id is not None else ""}{" AND " if card_id is not None and deck_id is not None else ""}{"`deck_id` = " + str(deck_id) if deck_id is not None else ""}{" AND " if (card_id is not None or deck_id is not None) and deck_type_id is not None else ""}"""

@@ -61,7 +61,7 @@ class Card:
         
     def filter(self, card_id=None, card_name=None, desc=None, pendulum_effect=None, level_rank=None, scale=None, attack=None, defense=None, category_id=None, card_type_id=None, attr_id=None, order='card_name', order_by='ASC', limit=0):
         if card_id is None and card_name is None and desc is None and pendulum_effect is None and level_rank is None and scale is None and attack is None and defense is None and category_id is None and card_type_id is None and attr_id is None:
-            return all()
+            return Card().all()
         
         
         DB.connect()
@@ -127,9 +127,9 @@ class Card:
         
         return self
             
-    def create(self, card_name, desc, category_id, card_type_id, pendulum_effect=None, level_rank=None, scale=None, attack=None, defense=None, attr_id=None):
+    def create(self, card_id, card_name, desc, category_id, card_type_id, pendulum_effect=None, level_rank=None, scale=None, attack=None, defense=None, attr_id=None):
         DB.connect()
-        query = f"""INSERT INTO `card`(`card_name`, `desc`, `category_id`, `card_type_id`{", `pendulum_effect`" if pendulum_effect is not None else ""}{", `level_rank`" if level_rank is not None else ""}{", `scale`" if scale is not None else ""}{", `attack`" if attack is not None else ""}{", `defense`" if defense is not None else ""}{", `attr_id`" if attr_id is not None else ""}) VALUES ('{card_name}' , '{desc}', {str(category_id)}, {str(card_type_id)}{", '" + pendulum_effect + "'" if pendulum_effect is not None else ""}{", " + str(level_rank) if level_rank is not None else ""}{", " + str(scale) if scale is not None else ""}{", " + str(attack) if attack is not None else ""}{", " + str(defense) if defense is not None else ""}{", " + str(attr_id) if attr_id is not None else ""})"""
+        query = f"""INSERT INTO `card`(`card_id`, `card_name`, `desc`, `category_id`, `card_type_id`{", `pendulum_effect`" if pendulum_effect is not None else ""}{", `level_rank`" if level_rank is not None else ""}{", `scale`" if scale is not None else ""}{", `attack`" if attack is not None else ""}{", `defense`" if defense is not None else ""}{", `attr_id`" if attr_id is not None else ""}) VALUES ('{card_id}', '{card_name}' , '{desc}', {str(category_id)}, {str(card_type_id)}{", '" + pendulum_effect + "'" if pendulum_effect is not None else ""}{", " + str(level_rank) if level_rank is not None else ""}{", " + str(scale) if scale is not None else ""}{", " + str(attack) if attack is not None else ""}{", " + str(defense) if defense is not None else ""}{", " + str(attr_id) if attr_id is not None else ""})"""
         query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
         

@@ -29,7 +29,10 @@ class MySQLDatabase:
                 query = query + f' ORDER BY `{order}` {order_by}'
             if limit > 0:
                 query = query + f' LIMIT {limit}'
-            print('query: ', query)
+            try:
+                print('query: ', query)
+            except:
+                print("utf-8 query: ", query.encode('utf-8'))
             cursor = self.connection.cursor()
             cursor.execute(query)
             

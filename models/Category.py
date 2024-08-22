@@ -28,7 +28,7 @@ class Category:
 
     def filter(self, category_id=None, category_name=None, order='category_name', order_by='ASC', limit=0):
         if category_id is None and category_name is None:
-            return all()
+            return Category().all()
         
         DB.connect()
         query = f"""SELECT * FROM `category` WHERE {"`category_id` = " + str(category_id) if category_id is not None else ""}{" AND " if category_id is not None and category_name is not None else ""}{"`category_name` = '" + category_name + "'" if category_name is not None else ""}"""

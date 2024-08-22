@@ -34,7 +34,7 @@ class Version:
 
     def filter(self, version_id=None, version_name=None, order='version_name', order_by='ASC', limit=0):
         if version_id is None and version_name is None:
-            return all()
+            return Version().all()
         
         DB.connect()
         query = f"""SELECT * FROM `version` WHERE {"`version_id` = " + str(version_id) if version_id is not None else ""}{" AND " if version_id is not None and version_name is not None else ""}{"`version_name` = '" + version_name + "'" if version_name is not None else ""}"""
