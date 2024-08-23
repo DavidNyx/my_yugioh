@@ -12,9 +12,13 @@ except:
     SubCategory = importlib.import_module("models.SubCategory")
 
 class Card_SubCategory:
-    def __init__(self, card_id:str=None, subcategory_id:int=None):
-        self.card = Card.Card().change_into(card_id=card_id)
-        self.subcategory = SubCategory.SubCategory().change_into(subcategory_id=subcategory_id)
+    def __init__(self, card_id:str=None, subcategory_id:int=None, empty=None):
+        if empty != 'all':
+            self.card = Card.Card().change_into(card_id=card_id, empty=empty)
+            self.subcategory = SubCategory.SubCategory().change_into(subcategory_id=subcategory_id, empty=empty)
+        else:
+            self.card = Card.Card().change_into(card_id=card_id, empty='subcategory')
+            self.subcategory = SubCategory.SubCategory().change_into(subcategory_id=subcategory_id, empty='card')
         
     def all(self, order='card_id', order_by='ASC', limit=0):
         DB.connect()
@@ -50,10 +54,10 @@ class Card_SubCategory:
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Card_SubCategory(i[0] if empty != 'card' else None, i[1] if empty != 'subcategory' else None))
+                result.append(Card_SubCategory(i[0] if empty != 'card' else None, i[1] if empty != 'subcategory' else None, empty))
             return result
         elif limit == 1:
-            return Card_SubCategory(query_result[0] if empty != 'card' else None, query_result[1] if empty != 'subcategory' else None)
+            return Card_SubCategory(query_result[0] if empty != 'card' else None, query_result[1] if empty != 'subcategory' else None, empty)
         else:
             return None
         
@@ -72,7 +76,7 @@ class Card_SubCategory:
             return None
         
         self.card = Card.Card().change_into(card_id=query_result[0])
-        self.subcategory = SubCategory.Subcategory().change_into(subcategory_id=query_result[1])
+        self.subcategory = SubCategory.SubCategory().change_into(subcategory_id=query_result[1])
         
         return self
     

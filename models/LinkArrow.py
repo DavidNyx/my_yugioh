@@ -54,7 +54,7 @@ class LinkArrow:
         else:
             return None
     
-    def change_into(self, link_arrow_id=None):
+    def change_into(self, link_arrow_id=None, empty=None):
         if link_arrow_id is None:
             self.link_arrow_id = None
             self.link_arrow_name = None
@@ -71,7 +71,10 @@ class LinkArrow:
         
         self.link_arrow_id = query_result[0]
         self.link_arrow_name = query_result[1]
-        self.card_links = Card_Link.Card_Link.filter(link_arrow_id=query_result[0])
+        if empty != 'card':
+            self.card_links = Card_Link.Card_Link().filter(link_arrow_id=query_result[0])
+        else:
+            self.card_links = []
         
         return self
 

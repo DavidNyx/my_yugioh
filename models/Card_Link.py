@@ -12,9 +12,13 @@ except:
     LinkArrow = importlib.import_module("models.LinkArrow")
 
 class Card_Link:
-    def __init__(self, card_id:str=None, link_arrow_id:int=None):
-        self.card = Card.Card().change_into(card_id=card_id)
-        self.link_arrow = LinkArrow.LinkArrow().change_into(link_arrow_id=link_arrow_id)
+    def __init__(self, card_id:str=None, link_arrow_id:int=None, empty:str=None):
+        if empty != 'all':
+            self.card = Card.Card().change_into(card_id=card_id, empty=empty)
+            self.link_arrow = LinkArrow.LinkArrow().change_into(link_arrow_id=link_arrow_id, empty=empty)
+        else:
+            self.card = Card.Card().change_into(card_id=card_id, empty='link')
+            self.link_arrow = LinkArrow.LinkArrow().change_into(link_arrow_id=link_arrow_id, empty='card')
         
     def all(self, order='card_id', order_by='ASC', limit=0):
         DB.connect()
@@ -28,10 +32,10 @@ class Card_Link:
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Card_Link(i[0], i[1]))
+                result.append(Card_Link(i[0], i[1], 'all'))
             return result
         elif limit == 1:
-            return Card_Link(query_result[0], query_result[1])
+            return Card_Link(query_result[0], query_result[1], 'all')
         else:
             return None
     
@@ -50,10 +54,10 @@ class Card_Link:
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Card_Link(i[0] if empty != 'card' else None, i[1] if empty != 'link' else None))
+                result.append(Card_Link(i[0] if empty != 'card' else None, i[1] if empty != 'link' else None, empty))
             return result
         elif limit == 1:
-            return Card_Link(query_result[0] if empty != 'card' else None, query_result[1] if empty != 'link' else None)
+            return Card_Link(query_result[0] if empty != 'card' else None, query_result[1] if empty != 'link' else None, empty)
         else:
             return None
         

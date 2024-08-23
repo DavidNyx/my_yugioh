@@ -14,9 +14,13 @@ except:
     Version = importlib.import_module("models.Version")
 
 class Card_Version():
-    def __init__(self, card_id:str=None, version_id:int=None, card_limit:int=None):
-        self.card = Card.Card().change_into(card_id=card_id)
-        self.version = Version.Version().change_into(version_id=version_id)
+    def __init__(self, card_id:str=None, version_id:int=None, card_limit:int=None, empty:str=None):
+        if empty != 'all':
+            self.card = Card.Card().change_into(card_id=card_id, empty=empty)
+            self.version = Version.Version().change_into(version_id=version_id, empty=empty)
+        else:
+            self.card = Card.Card().change_into(card_id=card_id, empty='version')
+            self.version = Version.Version().change_into(version_id=version_id, empty='card')
         self.card_limit = card_limit
         
     def all(self, order='card_limit', order_by='ASC', limit=0):
@@ -31,10 +35,10 @@ class Card_Version():
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Card_Version(i[0], i[1], i[2]))
+                result.append(Card_Version(i[0], i[1], i[2], 'all'))
             return result
         elif limit == 1:
-            return Card_Version(query_result[0], query_result[1], query_result[2])
+            return Card_Version(query_result[0], query_result[1], query_result[2], 'all')
         else:
             return None
     
@@ -53,10 +57,10 @@ class Card_Version():
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Card_Version(i[0] if empty != 'card' else None, i[1] if empty != 'version' else None, i[2]))
+                result.append(Card_Version(i[0] if empty != 'card' else None, i[1] if empty != 'version' else None, i[2], empty))
             return result
         elif limit == 1:
-            return Card_Version(query_result[0] if empty != 'card' else None, query_result[1] if empty != 'version' else None, query_result[2])
+            return Card_Version(query_result[0] if empty != 'card' else None, query_result[1] if empty != 'version' else None, query_result[2], empty)
         else:
             return None
         

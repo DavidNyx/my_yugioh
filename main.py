@@ -7,12 +7,12 @@ from urllib.parse import quote
 import os
 import time
 
-from controllers import AttributeController, Card_DeckController, Card_LinkController, Card_SubcategoryController, Card_VersionController, CardController, CardTypeController, CategoryController, DeckController, DeckTypeController, LinkArrowController, SubCategoryController, UserController, VersionController
+from controllers import AttributeController, Card_DeckController, Card_LinkController, Card_SubCategoryController, Card_VersionController, CardController, CardTypeController, CategoryController, DeckController, DeckTypeController, LinkArrowController, SubCategoryController, UserController, VersionController
 
 attribute_controller = AttributeController.AttributeController()
 card_deck_controller = Card_DeckController.Card_DeckController()
 card_link_controller = Card_LinkController.Card_LinkController()
-card_subcategory_controller = Card_SubcategoryController.Card_SubcategoryController()
+card_subcategory_controller = Card_SubCategoryController.Card_SubCategoryController()
 card_version_controller = Card_VersionController.Card_VersionController()
 card_controller = CardController.CardController()
 card_type_controller = CardTypeController.CardTypeController()
@@ -190,6 +190,8 @@ def read_card_rdf(rdf_file):
             elif pred == "http://yugipedia.com/wiki/Special:URIResolver/Property-3AEnglish_name":
                 if not obj.isdigit():
                     card_data["card_name"] = obj
+                else:
+                    card_data["card_name"] = obj.split(" ")[0]
             elif pred == "http://yugipedia.com/wiki/Special:URIResolver/Property-3ALore":
                 card_data["desc"] = obj
             elif pred == "http://yugipedia.com/wiki/Special:URIResolver/Property-3ALevel_string":
@@ -278,65 +280,87 @@ def write_all_json_file():
                 file.close()
 
 def load_data():
-    names = list_all_card_names()
-    for n in names:
-        t = quote(n.replace(' ', '_').replace('/','-2F')) + ".json"
-        if os.path.exists(JSON + t):
-            card_data = read_json_file(JSON + t)
+    files_and_dirs = os.listdir(JSON)
+    files = [f for f in files_and_dirs if os.path.isfile(os.path.join(JSON, f))]
+    for f in files:
+        card_data = read_json_file(JSON + f)
+        
+        if category_controller.filter(category_name=card_data['category'], limit=1) is None:
+            category_controller.create(category_name=card_data['category'])
+        if card_type_controller.filter(card_type_name=card_data['type'], limit=1) is None:
+            card_type_controller.create(card_type_name=card_data['type'])
+        category_id = category_controller.filter(category_name=card_data['category'], limit=1).category_id
+        card_type_id = card_type_controller.filter(card_type_name=card_data['type'], limit=1).card_type_id
+        pendulum_effect = None
+        level_rank = None
+        scale = None
+        attack = None
+        defense = None
+        attr_id = None
             
-            if category_controller.filter(category_name=card_data['category'], limit=1) is None:
-                category_controller.create(category_name=card_data['category'])
-            if card_type_controller.filter(card_type_name=card_data['type'], limit=1) is None:
-                card_type_controller.create(card_type_name=card_data['type'])
-            category_id = category_controller.filter(category_name=card_data['category'], limit=1).category_id
-            card_type_id = card_type_controller.filter(card_type_name=card_data['type'], limit=1).card_type_id
-            pendulum_effect = None
-            level_rank = None
-            scale = None
-            attack = None
-            defense = None
-            attr_id = None
-                
-            if 'pendulum_effect' in card_data:
-                pendulum_effect = card_data['pendulum_effect']
-            if 'level' in card_data:
-                level_rank = card_data['level']
-            if 'rank' in card_data:
-                level_rank = card_data['rank']
-            if 'scale' in card_data:
-                scale = card_data['scale']
-            if 'attack' in card_data:
-                attack = card_data['attack']
-            if 'defense' in card_data:
-                defense = card_data['defense']
-            if 'attr' in card_data:
-                if attribute_controller.filter(attr_name=card_data['attr'], limit=1) is None:
-                    attribute_controller.create(attr_name=card_data['attr'])
-                attr_id = attribute_controller.filter(attr_name=card_data['attr'], limit=1).attr_id
+        if 'pendulum_effect' in card_data:
+            pendulum_effect = card_data['pendulum_effect']
+        if 'level' in card_data:
+            level_rank = card_data['level']
+        if 'rank' in card_data:
+            level_rank = card_data['rank']
+        if 'scale' in card_data:
+            scale = card_data['scale']
+        if 'atk' in card_data:
+            if card_data['atk'] == '?':
+                attack = -1
+            else:
+                attack = int(card_data['atk'])
+        if 'def' in card_data:
+            if card_data['def'] == '?':
+                defense = -1
+            else:
+                defense = int(card_data['def'])
+        if 'attr' in card_data:
+            if attribute_controller.filter(attr_name=card_data['attr'], limit=1) is None:
+                attribute_controller.create(attr_name=card_data['attr'])
+            attr_id = attribute_controller.filter(attr_name=card_data['attr'], limit=1).attr_id
+        
+        if 'card_id' in card_data:
+            print()
+            print("CARD: ", card_data['card_id'])
+            print()
+            card_controller.create(card_id=card_data['card_id'], card_name=card_data['card_name'], desc=card_data['desc'], category_id=category_id, card_type_id=card_type_id, pendulum_effect=pendulum_effect, level_rank=level_rank, scale=scale, attack=attack, defense=defense, attr_id=attr_id)
+        
+            if 'tcg' in card_data['versions']:
+                card_version_controller.create(card_id=card_data['card_id'], version_id=1, card_limit=card_data['versions']['tcg'])
+            if 'ocg' in card_data['versions']:
+                card_version_controller.create(card_id=card_data['card_id'], version_id=2, card_limit=card_data['versions']['ocg'])
             
-            if 'card_id' in card_data:  
-                card_controller.create(card_id=card_data['card_id'], card_name=card_data['card_name'], desc=card_data['desc'], category_id=category_id, card_type_id=card_type_id, pendulum_effect=pendulum_effect, level_rank=level_rank, scale=scale, attack=attack, defense=defense, attr_id=attr_id)
+            if 'subcategory' in card_data:
+                for i in card_data['subcategory']:
+                    if subcategory_controller.filter(subcategory_name=i, limit=1) is None:
+                        subcategory_controller.create(subcategory_name=i)
+                    subcategory_id = subcategory_controller.filter(subcategory_name=i, limit=1).subcategory_id
+                    card_subcategory_controller.create(subcategory_id=subcategory_id, card_id=card_data['card_id'])
             
-                if 'tcg' in card_data['versions']:
-                    card_version_controller.create(card_id=card_data['card_id'], version_id=1, card_limit=card_data['versions']['tcg'])
-                if 'ocg' in card_data['versions']:
-                    card_version_controller.create(card_id=card_data['card_id'], version_id=2, card_limit=card_data['versions']['ocg'])
-                
-                if 'subcategory' in card_data:
-                    for i in card_data['subcategory']:
-                        if subcategory_controller.filter(subcategory_name=i, limit=1) is None:
-                            subcategory_controller.create(subcategory_name=i)
-                        subcategory_id = subcategory_controller.filter(subcategory_name=i, limit=1).subcategory_id
-                        card_subcategory_controller.create(subcategory_id=subcategory_id, card_id=card_data['card_id'])
-                
-                if len(card_data['link_arrows']) > 0:
-                    for i in card_data['link_arrows']:
-                        if link_arrow_controller.filter(link_arrow_name=i, limit=1) is None:
-                            link_arrow_controller.create(link_arrow_name=i)
-                        link_arrow_id = link_arrow_controller.filter(link_arrow_name=i, limit=1).link_arrow_id
-                        card_link_controller.create(link_arrow_id=link_arrow_id, card_id=card_data['card_id'])
+            if len(card_data['link_arrows']) > 0:
+                for i in card_data['link_arrows']:
+                    if link_arrow_controller.filter(link_arrow_name=i, limit=1) is None:
+                        link_arrow_controller.create(link_arrow_name=i)
+                    link_arrow_id = link_arrow_controller.filter(link_arrow_name=i, limit=1).link_arrow_id
+                    card_link_controller.create(link_arrow_id=link_arrow_id, card_id=card_data['card_id'])
+                    
+            print()
+            card = card_controller.filter(card_id=card_data['card_id'], limit=1)
+            print("Card Id: " + card.card_id)
+            print("Card Name: " + str(card.card_name.encode('utf-8')))
+            print("Description: " + str(card.desc.encode('utf-8')))
+            print("Category: " + str(card.category.category_name) if card.category is not None else "")
+            print("Card Type: " + str(card.type.card_type_name) if card.type is not None else "")
+            print("Pendulum Effect: " + str(str(card.pendulum_effect).encode('utf-8')))
+            print("Level Rank: " + str(card.level_rank))
+            print("Attack: " + str(card.attack))
+            print("Defense: " + str(card.defense))
+            print("Scale: " + str(card.scale))
+            print("Attribute: " + str(card.attr.attr_name) if card.attr is not None else "")
+            print()
             
-
 def main():
     # write_all_json_file()
     load_data()

@@ -16,10 +16,15 @@ except:
     DeckType = importlib.import_module("models.DeckType")
 
 class Card_Deck:
-    def __init__(self, card_id:str=None, deck_id:int=None, deck_type_id:int=None, number_of_copies:int=0):
-        self.card = Card.Card().change_into(card_id=card_id)
-        self.deck = Deck.Deck().change_into(deck_id=deck_id)
-        self.deck_type = DeckType.DeckType().change_into(deck_type_id=deck_type_id)
+    def __init__(self, card_id:str=None, deck_id:int=None, deck_type_id:int=None, number_of_copies:int=0,empty:str=None):
+        if empty != 'all':
+            self.card = Card.Card().change_into(card_id=card_id, empty=empty)
+            self.deck = Deck.Deck().change_into(deck_id=deck_id, empty=empty)
+            self.deck_type = DeckType.DeckType().change_into(deck_type_id=deck_type_id, empty=empty)
+        else:
+            self.card = Card.Card().change_into(card_id=card_id, empty='deck')
+            self.deck = Deck.Deck().change_into(deck_id=deck_id, empty='deck_type')
+            self.deck_type = DeckType.DeckType().change_into(deck_type_id=deck_type_id, empty='card')
         self.number_of_copies = number_of_copies
         
     def all(self, order='card_id', order_by='ASC', limit=0):
@@ -34,10 +39,10 @@ class Card_Deck:
         if limit == 0 or limit > 1:
             result = []
             for i in query_result:
-                result.append(Card_Deck(i[0], i[1], i[2], i[3]))
+                result.append(Card_Deck(i[0], i[1], i[2], i[3], 'all'))
             return result
         elif limit == 1:
-            return Card_Deck(query_result[0], query_result[1], query_result[2], query_result[3])
+            return Card_Deck(query_result[0], query_result[1], query_result[2], query_result[3], 'all')
         else:
             return None
     

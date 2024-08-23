@@ -53,7 +53,7 @@ class SubCategory:
         else:
             return None
     
-    def change_into(self, subcategory_id=None):
+    def change_into(self, subcategory_id=None, empty=None):
         if subcategory_id is None:
             self.subcategory_id = None
             self.subcategory_name = None
@@ -69,8 +69,10 @@ class SubCategory:
         
         self.subcategory_id = query_result[0]
         self.subcategory_name = query_result[1]
-        self.card_subcategories = Card_SubCategory.Card_SubCategory().filter(subcategory_id=query_result[0], empty='subcategory')
-        
+        if empty != 'card':
+            self.card_subcategories = Card_SubCategory.Card_SubCategory().filter(subcategory_id=query_result[0], empty='subcategory')
+        else:
+            self.card_subcategories = []
         return self
 
     def create(self, subcategory_name):

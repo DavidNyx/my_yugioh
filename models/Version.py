@@ -54,7 +54,7 @@ class Version:
         else:
             return None
     
-    def change_into(self, version_id=None):
+    def change_into(self, version_id=None, empty=None):
         if version_id is None:
             self.version_id = None
             self.version_name = None
@@ -70,8 +70,10 @@ class Version:
         
         self.version_id = query_result[0]
         self.version_name = query_result[1]
-        self.card_versions = Card_Version.Card_Version().filter(version_id=query_result[0], empty='version')
-        
+        if empty != 'card':
+            self.card_versions = Card_Version.Card_Version().filter(version_id=query_result[0], empty='version')
+        else:
+            self.card_versions = []
         return self
 
     def create(self, version_name):

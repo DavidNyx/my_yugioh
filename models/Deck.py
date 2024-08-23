@@ -59,7 +59,7 @@ class Deck:
         else:
             return None
     
-    def change_into(self, deck_id=None):
+    def change_into(self, deck_id=None, empty=None):
         if deck_id is None:
             self.deck_id = None
             self.deck_name = None
@@ -82,7 +82,10 @@ class Deck:
         self.owner = User().change_into(query_result[2])
         self.created_at = query_result[3]
         self.updated_at = query_result[4]
-        self.card_decks = Card_Deck.Card_Deck().filter(deck_id=query_result[0], empty='deck')
+        if empty != 'card' or empty != 'deck_type':
+            self.card_decks = Card_Deck.Card_Deck().filter(deck_id=query_result[0], empty='deck')
+        else:
+            self.card_decks = []
         
         return self
 

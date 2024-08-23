@@ -1,6 +1,7 @@
 import mysql.connector
 from dotenv import load_dotenv
 import os
+import time
 
 class MySQLDatabase:
     def __init__(self, host, user, database):
@@ -9,7 +10,7 @@ class MySQLDatabase:
         self.database = database
         self.connection = None
 
-    def connect(self):
+    def connect(self, counter=0):
         try:
             self.connection = mysql.connector.connect(
                 host=self.host,
@@ -18,6 +19,13 @@ class MySQLDatabase:
             )
         except mysql.connector.Error as e:
             print("Error connecting to MySQL database:", e)
+            time.sleep(5)
+            c = counter + 1
+            if c < 6:
+                print("Try again atempt: ", str(c))
+                self.connect(counter=c)
+            else:
+                print("Failed to connect to MySQL database after 5 attempts.")
 
     def disconnect(self):
         if self.connection is not None and self.connection.is_connected():

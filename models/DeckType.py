@@ -56,7 +56,7 @@ class DeckType:
         else:
             return None
         
-    def change_into(self, deck_type_id=None):
+    def change_into(self, deck_type_id=None, empty=None):
         if deck_type_id is None:
             self.deck_type_id = None
             self.deck_type_name = None
@@ -77,7 +77,10 @@ class DeckType:
         self.deck_type_name = query_result[1]
         self.min_size = query_result[2]
         self.max_size = query_result[3]
-        self.card_decks = Card_Deck.Card_Deck().filter(deck_type_id=query_result[0], empty='deck_type')
+        if empty != 'card' or empty != 'deck':
+            self.card_decks = Card_Deck.Card_Deck().filter(deck_type_id=query_result[0], empty='deck_type')
+        else:
+            self.card_decks = []
         
         return self
 

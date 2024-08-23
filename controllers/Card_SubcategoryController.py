@@ -2,7 +2,7 @@ import sys
 sys.path.append('./')
 from models.Card_SubCategory import Card_SubCategory
 
-class Card_SubcategoryController(Card_SubCategory):
+class Card_SubCategoryController(Card_SubCategory):
     def __init__(self, card_id: str = None, subcategory_id: int = None):
         super().__init__(card_id, subcategory_id)
         

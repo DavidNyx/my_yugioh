@@ -82,7 +82,7 @@ class Card:
         else:
             return None
         
-    def change_into(self, card_id=None):
+    def change_into(self, card_id=None, empty=None):
         if card_id is None:
             self.card_id = None
             self.card_name = None
@@ -120,15 +120,33 @@ class Card:
         self.category = Category().change_into(category_id=query_result[8])
         self.type = CardType().change_into(card_type_id=query_result[9])
         self.attr = Attribute().change_into(attr_id=query_result[10])
-        self.card_versions = Card_Version.Card_Version().filter(card_id=query_result[0], empty='card')
-        self.card_links = Card_Link.Card_Link().filter(card_id=query_result[0], empty='card')
-        self.card_subcategories = Card_SubCategory.Card_SubCategory().filter(card_id=query_result[0], empty='card')
-        self.card_decks = Card_Deck.Card_Deck().filter(card_id=query_result[0], empty='card')
+        if empty != 'version':
+            self.card_versions = Card_Version.Card_Version().filter(card_id=query_result[0], empty='card')
+        else:
+            self.card_versions = []
+        if empty != 'link':
+            self.card_links = Card_Link.Card_Link().filter(card_id=query_result[0], empty='card')
+        else:
+            self.card_links = []
+        if empty!= 'subcategory':
+            self.card_subcategories = Card_SubCategory.Card_SubCategory().filter(card_id=query_result[0], empty='card')
+        else:
+            self.card_subcategories = []
+        if empty!= 'deck' or empty!= 'deck_type':
+            self.card_decks = Card_Deck.Card_Deck().filter(card_id=query_result[0], empty='card')
+        else:
+            self.card_decks = []
         
         return self
             
     def create(self, card_id, card_name, desc, category_id, card_type_id, pendulum_effect=None, level_rank=None, scale=None, attack=None, defense=None, attr_id=None):
         DB.connect()
+        if card_name is not None:
+            card_name = card_name.replace("'", "\\'")
+        if desc is not None:
+            desc = desc.replace("'", "\\'")
+        if pendulum_effect is not None:
+            pendulum_effect = pendulum_effect.replace("'", "\\'")
         query = f"""INSERT INTO `card`(`card_id`, `card_name`, `desc`, `category_id`, `card_type_id`{", `pendulum_effect`" if pendulum_effect is not None else ""}{", `level_rank`" if level_rank is not None else ""}{", `scale`" if scale is not None else ""}{", `attack`" if attack is not None else ""}{", `defense`" if defense is not None else ""}{", `attr_id`" if attr_id is not None else ""}) VALUES ('{card_id}', '{card_name}' , '{desc}', {str(category_id)}, {str(card_type_id)}{", '" + pendulum_effect + "'" if pendulum_effect is not None else ""}{", " + str(level_rank) if level_rank is not None else ""}{", " + str(scale) if scale is not None else ""}{", " + str(attack) if attack is not None else ""}{", " + str(defense) if defense is not None else ""}{", " + str(attr_id) if attr_id is not None else ""})"""
         query_result = DB.execute_query(query, limit=-1)
         DB.disconnect()
@@ -143,6 +161,12 @@ class Card:
             return self
         
         DB.connect()
+        if card_name is not None:
+            card_name = card_name.replace("'", "\\'")
+        if desc is not None:
+            desc = desc.replace("'", "\\'")
+        if pendulum_effect is not None:
+            pendulum_effect = pendulum_effect.replace("'", "\\'")
         query = f"""UPDATE `card` SET {"`card_name` = '" + card_name + "'" if card_name is not None else ""}{", " if card_name is not None and desc is not None else ""}{"`desc` = '" + desc + "'" if desc is not None else ""}{", " if (card_name is not None or desc is not None) and pendulum_effect is not None else ""}{"`pendulum_effect` = '" + pendulum_effect + "'" if pendulum_effect is not None else ""}{", " if (card_name is not None or desc is not None or pendulum_effect is not None) and level_rank is not None else ""}{"`level_rank` = " + str(level_rank) if level_rank is not None else ""}{", " if (card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None) and scale is not None else ""}{"`scale` = " + str(scale) if scale is not None else ""}{", " if (card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None) and attack is not None else ""}{"`attack` = " + str(attack) if attack is not None else ""}{", " if (card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None) and attack is not None else ""}{"`attack` = " + str(attack) if attack is not None else ""}{", " if (card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None or attack is not None) and defense is not None else ""}{"`defense` = " + str(defense) if defense is not None else ""}{", " if (card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None or attack is not None or defense is not None) and category_id is not None else ""}{"`category_id` = " + str(category_id) if category_id is not None else ""}{", " if (card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None or attack is not None or defense is not None or category_id is not None) and card_type_id is not None else ""}{"`card_type_id` = " + str(card_type_id) if card_type_id is not None else ""}{", " if (card_name is not None or desc is not None or pendulum_effect is not None or level_rank is not None or scale is not None or attack is not None or defense is not None or category_id is not None or card_type_id is not None) and attr_id is not None else ""}{"`attr_id` = " + str(attr_id) if attr_id is not None else ""} WHERE `card_id` = {str(card_id) if card_id is not None else str(self.card_id)}"""
         query_result = DB.execute_query(query)
         DB.disconnect()
